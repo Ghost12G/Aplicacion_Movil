@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "Aplicacion-Movil",
+    "name": "CLINIC DIGITAL",
     "slug": "Aplicacion-Movil",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/icon-digital.png",
     "scheme": "aplicacionmovil",
     "userInterfaceStyle": "automatic",
     "ios": {
@@ -28,9 +28,9 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#208AEF",
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 76
+          "backgroundColor": "#F0F9FF",
+          "image": "./assets/images/logo-clinic-digital.png",
+          "imageWidth": 200
         }
       ]
     ],
