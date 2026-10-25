@@ -30,7 +30,7 @@ export default function Calendario({ fechaElegida, onElegir }: Props) {
     setMesActual(new Date(anio, mes + cantidad, 1));
   };
 
-  
+  // Celdas: primero los huecos vacíos, luego los días del mes
   const celdas: (Date | null)[] = [];
   for (let i = 0; i < mesActual.getDay(); i++) {
     celdas.push(null);

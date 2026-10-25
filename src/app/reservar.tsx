@@ -34,7 +34,7 @@ export default function Reservar() {
   const [consentimiento, setConsentimiento] = useState(false);
   const [exito, setExito] = useState(false);
 
-
+  // Buscador: se queda con las especialidades que contienen lo escrito
   const listaFiltrada = especialidades.filter((e) =>
     e.nombre.toLowerCase().includes(busqueda.toLowerCase())
   );

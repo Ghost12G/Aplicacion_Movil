@@ -4,7 +4,7 @@ import { useRouter } from "expo-router";
 
 interface Props {
   titulo: string;
-  onAtras?: () => void; 
+  onAtras?: () => void; // si no se envía, vuelve a la pantalla anterior
 }
 
 export default function Cabecera({ titulo, onAtras }: Props) {

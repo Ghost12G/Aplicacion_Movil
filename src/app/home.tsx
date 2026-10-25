@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ScrollView, View, Text, Pressable, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { Href, useRouter } from "expo-router";
 import MenuItem from "../components/menuItems";
 import MenuLateral from "../components/MenuLateral";
 import { CENTRO } from "../data/catalogo";
@@ -18,6 +18,12 @@ export default function Home() {
     setMenuVisible(false);
     salir();
     router.replace("/login");
+  };
+
+  // Cierra el menú y va a otra pantalla
+  const ir = (ruta: Href) => {
+    setMenuVisible(false);
+    router.push(ruta);
   };
 
   return (
@@ -68,11 +74,23 @@ export default function Home() {
           icono="calendar"
           onPress={() => router.push("/citas")}
         />
-        <MenuItem titulo="Atenciones Realizadas" icono="medkit" />
+        <MenuItem
+          titulo="Atenciones Realizadas"
+          icono="medkit"
+          onPress={() => router.push("/atenciones")}
+        />
 
         <Text className="text-2xl font-bold mt-4 mb-3">Ordenes Médicas</Text>
-        <MenuItem titulo="Recetas" icono="document-text" />
-        <MenuItem titulo="Descansos Médicos" icono="bed" />
+        <MenuItem
+          titulo="Recetas"
+          icono="document-text"
+          onPress={() => router.push("/recetas")}
+        />
+        <MenuItem
+          titulo="Descansos Médicos"
+          icono="bed"
+          onPress={() => router.push("/descansos")}
+        />
 
         <View className="h-8" />
       </ScrollView>
@@ -81,6 +99,8 @@ export default function Home() {
       <MenuLateral
         visible={menuVisible}
         onClose={() => setMenuVisible(false)}
+        onPerfil={() => ir("/perfil")}
+        onDiabetes={() => ir("/diabetes")}
         onCerrarSesion={cerrarSesion}
         centro={CENTRO}
         vigencia="07/11/2026"

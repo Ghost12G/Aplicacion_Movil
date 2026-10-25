@@ -4,6 +4,8 @@ import { Ionicons } from "@expo/vector-icons";
 interface Props {
   visible: boolean;
   onClose: () => void;
+  onPerfil: () => void;
+  onDiabetes: () => void;
   onCerrarSesion: () => void;
   centro: string;
   vigencia: string;
@@ -19,7 +21,7 @@ function ItemMenu({ icono, titulo, onPress }: ItemProps) {
   return (
     <Pressable onPress={onPress} className="flex-row items-center px-5 py-4">
       <Ionicons name={icono} size={26} color="#0369a1" />
-      <Text className="ml-4 text-lg">{titulo}</Text>
+      <Text className="ml-4 text-lg flex-1">{titulo}</Text>
     </Pressable>
   );
 }
@@ -27,6 +29,8 @@ function ItemMenu({ icono, titulo, onPress }: ItemProps) {
 export default function MenuLateral({
   visible,
   onClose,
+  onPerfil,
+  onDiabetes,
   onCerrarSesion,
   centro,
   vigencia,
@@ -54,7 +58,8 @@ export default function MenuLateral({
           </View>
 
           <ItemMenu icono="home" titulo="Inicio" onPress={onClose} />
-          <ItemMenu icono="person" titulo="Mi Perfil" onPress={onClose} />
+          <ItemMenu icono="person" titulo="Mi Perfil" onPress={onPerfil} />
+          <ItemMenu icono="water" titulo="Riesgo Diabetes Tipo 2" onPress={onDiabetes} />
 
           <View className="border-t border-gray-300 mt-2" />
           <ItemMenu

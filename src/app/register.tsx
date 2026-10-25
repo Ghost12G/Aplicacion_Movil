@@ -82,6 +82,10 @@ export default function Register() {
       dni: valores.documento,
       password: valores.password,
       nombre: valores.nombre.trim(),
+      operador: "Claro",
+      celular: valores.celular,
+      telefonoFijo: "",
+      correo: valores.correo.trim(),
     });
 
     if (!guardado) {
