@@ -14,7 +14,7 @@ const preguntas = [
     campo: "actividad",
     texto: "¿Realiza al menos 30 minutos de actividad física?",
     opciones: ["Sí", "No"],
-    horizontal: true,
+    horizontal: false,
   },
   {
     campo: "frutas",
@@ -26,13 +26,13 @@ const preguntas = [
     campo: "presion",
     texto: "¿Toma medicación para la presión alta o padece de Hipertensión Arterial?",
     opciones: ["No", "Sí"],
-    horizontal: true,
+    horizontal: false,
   },
   {
     campo: "glucosa",
     texto: "¿Le han encontrado alguna vez valores de glucosa altos?",
     opciones: ["No", "Sí"],
-    horizontal: true,
+    horizontal: false,
   },
   {
     campo: "familia",

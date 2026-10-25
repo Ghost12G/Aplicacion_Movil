@@ -10,7 +10,7 @@ const usuarios: Usuario[] = [
     operador: "Claro",
     celular: "999888777",
     telefonoFijo: "044222333",
-    correo: "jose.palacios@correo.com",
+    correo: "ghost_90@out.pe",
   },
 ];
 let usuarioActual: Usuario | null = null;

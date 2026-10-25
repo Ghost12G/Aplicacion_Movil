@@ -98,7 +98,7 @@ export default function Recetas() {
 
               <Pressable
                 onPress={() =>
-                  Alert.alert("Ver receta", "El PDF de la receta no está disponible en esta versión de práctica")
+                  Alert.alert("Ver receta", "El PDF de la receta no está disponible por el momento")
                 }
                 className="flex-row items-center bg-sky-600 rounded-full px-4 py-2 self-end my-3"
               >

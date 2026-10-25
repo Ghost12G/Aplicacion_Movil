@@ -1,6 +1,6 @@
 import { Especialidad } from "../types/usuario";
 
-export const CENTRO = "Nombre de tu clínica";
+export const CENTRO = "Huanchaco - Trujillo";
 
 export const especialidades: Especialidad[] = [
   {
