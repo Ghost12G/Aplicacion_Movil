@@ -189,6 +189,22 @@ Después de cerrar sesión con la casilla Recordar Cuenta marcada.
 
 ![Formulario de nueva solicitud](assets/screenshots/solicitud.png)
 
+### Solictud Exitosa
+
+![Mis solicitudes de exito](assets/screenshots/solicitudExitosa.png)
+
+### Mis solicitudes
+
+Lista con buscador, filtro por tipo y botones para editar y eliminar.
+
+![Mis solicitudes](assets/screenshots/solicitudCrud.png)
+
+### Eliminar solicitud
+
+![Formulario de eliminar de solicitud](assets/screenshots/solicitudDelete.png)
+
+
+
 ### Mi perfil
 
 ![Mi perfil](assets/screenshots/perfil.png)

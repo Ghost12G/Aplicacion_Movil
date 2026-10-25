@@ -1,4 +1,4 @@
-import { Cita, ContactoPerfil, Usuario } from "../types/usuario";
+import { Cita, ContactoPerfil, DatosSolicitud, Solicitud, Usuario } from "../types/usuario";
 
 // Datos EN MEMORIA: se guardan mientras la app está abierta
 // y se pierden cuando se cierra.
@@ -10,12 +10,13 @@ const usuarios: Usuario[] = [
     operador: "Claro",
     celular: "999888777",
     telefonoFijo: "044222333",
-    correo: "ghost_90@out.pe",
+    correo: "jose.palacios@correo.com",
   },
 ];
 let usuarioActual: Usuario | null = null;
 let cuentaRecordada: Usuario | null = null;
 let citas: Cita[] = [];
+let solicitudes: Solicitud[] = [];
 
 // ---------- Usuarios ----------
 export function registrarUsuario(nuevo: Usuario): boolean {
@@ -85,4 +86,21 @@ export function obtenerCitas(): Cita[] {
 
 export function cancelarCita(id: string) {
   citas = citas.filter((c) => c.id !== id);
+}
+
+// ---------- Solicitudes (crear, leer, actualizar, eliminar) ----------
+export function agregarSolicitud(solicitud: Solicitud) {
+  solicitudes.push(solicitud);
+}
+
+export function obtenerSolicitudes(): Solicitud[] {
+  return [...solicitudes];
+}
+
+export function actualizarSolicitud(id: string, datos: DatosSolicitud) {
+  solicitudes = solicitudes.map((s) => (s.id === id ? { ...s, ...datos } : s));
+}
+
+export function eliminarSolicitud(id: string) {
+  solicitudes = solicitudes.filter((s) => s.id !== id);
 }

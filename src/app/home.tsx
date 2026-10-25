@@ -67,6 +67,11 @@ export default function Home() {
           icono="create"
           onPress={() => router.push("/solicitud")}
         />
+        <MenuItem
+          titulo="Mis solicitudes"
+          icono="list"
+          onPress={() => router.push("/solicitudes")}
+        />
 
         <Text className="text-2xl font-bold mt-4 mb-3">Citas</Text>
         <MenuItem
