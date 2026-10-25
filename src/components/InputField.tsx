@@ -29,7 +29,7 @@ export default function InputField({
         <View className="mb-4">
             <View
                 className={`flex-row bg-gray-100 px-3 py-2 border-b-2 border-gray-700 ${multilinea ? "items-start" : "items-center"
-                    }`}
+                    } ${error ? "border-red-500" : "border-gray-700"}`}
             >
                 <Ionicons name={icono} size={22} color="#374151" />
                 <TextInput

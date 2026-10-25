@@ -1,12 +1,24 @@
 import { useEffect } from "react";
-import { useRouter } from "expo-router";
+import { router, useRouter } from "expo-router";
+import { View } from "react-native";
 
 export default function Index() {
-  const router = useRouter();
+
+  useEffect(() => {
+    const timeOut = setTimeout(() => {
+      router.replace('/login');
+    }, 0);
+
+    return ()=> clearTimeout(timeOut);
+  },[])
+
+  return <View className='flex-1 bg-slate-100'></View>
+
+  /* const router = useRouter();
 
   useEffect(() => {
     router.replace("/login");
   }, [router]);
 
-  return null;
+  return null; */
 }

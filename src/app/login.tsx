@@ -6,13 +6,7 @@ import InputField from "../components/InputField";
 import Boton from "../components/boton";
 import AvisoInfo from "../components/AvisoInfo";
 import { useFormulario } from "../hooks/useFormulario";
-import { Usuario } from "../types/usuario";
-
-const usuarioPrueba: Usuario = {
-  dni: "12345678",
-  password: "1234",
-  nombre: "Jose Palacios",
-};
+import { iniciarSesion } from "../data/almacen";
 
 export default function Login() {
   const router = useRouter();
@@ -21,7 +15,6 @@ export default function Login() {
     dni: "",
     password: "",
   });
-
 
   const ingresar = () => {
     const nuevosErrores: Record<string, string> = {};
@@ -32,16 +25,14 @@ export default function Login() {
     if (valores.password.trim() === "") {
       nuevosErrores.password = "La contraseña no puede estar vacía";
     }
-
     if (Object.keys(nuevosErrores).length > 0) {
       setErrores(nuevosErrores);
       return;
     }
 
-    if (
-      valores.dni === usuarioPrueba.dni &&
-      valores.password === usuarioPrueba.password
-    ) {
+    const usuario = iniciarSesion(valores.dni, valores.password);
+
+    if (usuario) {
       setErrores({});
       router.replace("/home");
     } else {
@@ -55,8 +46,8 @@ export default function Login() {
       contentContainerClassName="px-6 pt-16 pb-8"
     >
       <Image
-        source={require("../../assets/images/logo-clinic-digital.png")}
-        className="w-full h-60 mb-6"
+        source={require("../../assets/images/logo-clinic-digital-horizontal.png")}
+        className="w-full h-32 mb-6"
         resizeMode="contain"
       />
 

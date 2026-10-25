@@ -1,5 +1,6 @@
 import { View, Text, ScrollView, Pressable, Alert } from "react-native";
 import { useRouter } from "expo-router";
+import Cabecera from "../components/Cabecera";
 import InputField from "../components/InputField";
 import Boton from "../components/boton";
 import { useFormulario } from "../hooks/useFormulario";
@@ -61,13 +62,10 @@ export default function SolicitudScreen() {
   };
 
   return (
-    <ScrollView
-      className="flex-1 bg-cyan-50"
-      contentContainerClassName="px-6 pt-16 pb-10"
-    >
-      <View className="bg-white rounded-2xl p-5">
-        <Text className="text-3xl font-bold text-center mb-6">Nueva solicitud</Text>
+    <View className="flex-1 bg-white">
+      <Cabecera titulo="Nueva solicitud" />
 
+      <ScrollView className="px-4 pt-6" contentContainerClassName="pb-10">
         <InputField
           icono="person"
           placeholder="Nombre del cliente"
@@ -118,13 +116,7 @@ export default function SolicitudScreen() {
         />
 
         <Boton titulo="Enviar solicitud" onPress={enviar} />
-        <View className="h-3" />
-        <Boton
-          titulo="Volver"
-          variante="secundario"
-          onPress={() => router.back()}
-        />
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 }
