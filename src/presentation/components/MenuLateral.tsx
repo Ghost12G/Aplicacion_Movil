@@ -47,7 +47,7 @@ export default function MenuLateral({
         <View className="w-3/4 bg-white">
           <View className="bg-sky-100 pt-14 px-5 pb-5">
             <Image
-              source={require("../../assets/images/logo-clinic-digital-horizontal.png")}
+              source={require("../../../assets/images/logo-clinic-digital-horizontal.png")}
               className="w-full h-20 mb-4"
               resizeMode="contain"
             />

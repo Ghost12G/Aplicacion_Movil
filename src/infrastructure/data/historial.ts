@@ -1,5 +1,5 @@
-import { Atencion, Descanso, Receta } from "../types/usuario";
-import { fechaRelativa } from "../utils/fechas";
+import { Atencion, Descanso, Receta } from "../../domain/entities/Historial";
+import { fechaRelativa } from "../../shared/fechas";
 
 // Datos de ejemplo (solo lectura)
 export const atenciones: Atencion[] = [

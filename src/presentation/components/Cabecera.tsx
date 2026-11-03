@@ -21,7 +21,7 @@ export default function Cabecera({ titulo, onAtras }: Props) {
       </Text>
 
       <Image
-        source={require("../../assets/images/logo-clinic-digital-horizontal.png")}
+        source={require("../../../assets/images/logo-clinic-digital-horizontal.png")}
         className="w-28 h-10"
         resizeMode="contain"
       />

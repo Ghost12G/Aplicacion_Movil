@@ -1,7 +1,7 @@
-import { ReactNode } from "react";
-import { View, Text, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { MESES } from "../utils/fechas";
+import { ReactNode } from "react";
+import { Pressable, Text, View } from "react-native";
+import { MESES } from "../../shared/fechas";
 
 interface Props {
   fecha: Date;

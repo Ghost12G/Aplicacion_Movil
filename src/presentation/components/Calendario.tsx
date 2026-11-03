@@ -1,7 +1,7 @@
-import { useState } from "react";
-import { View, Text, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { esDiaAgotado, formatearFecha } from "../utils/fechas";
+import { useState } from "react";
+import { Pressable, Text, View } from "react-native";
+import { esDiaAgotado, formatearFecha } from "../../shared/fechas";
 
 interface Props {
   fechaElegida: string; // formato DD/MM/AAAA

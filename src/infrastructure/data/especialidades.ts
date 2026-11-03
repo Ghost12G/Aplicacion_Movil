@@ -1,6 +1,4 @@
-import { Especialidad } from "../types/usuario";
-
-export const CENTRO = "Huanchaco - Trujillo";
+import { Especialidad } from "../../domain/entities/Especialidad";
 
 export const especialidades: Especialidad[] = [
   {
