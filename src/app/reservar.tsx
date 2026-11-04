@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { View, Text, ScrollView, Pressable } from "react-native";
+import { useEffect, useState } from "react";
+import { View, Text, ScrollView, Pressable, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import Cabecera from "../components/Cabecera";
@@ -10,9 +10,14 @@ import Buscador from "../components/Buscador";
 import ModalExito from "../components/ModalExito";
 import Boton from "../components/boton";
 import { CENTRO, especialidades } from "../data/catalogo";
-import { agregarCita, obtenerUsuarioActual } from "../data/almacen";
+import {
+  agregarCita,
+  obtenerCuposDisponibles,
+  obtenerUsuarioActual,
+} from "../data/almacen";
 import {
   HORAS_DISPONIBLES,
+  esHoraPasada,
   formatearFecha,
   proximaFechaLibre,
 } from "../utils/fechas";
@@ -33,6 +38,18 @@ export default function Reservar() {
   const [tempHora, setTempHora] = useState("");
   const [consentimiento, setConsentimiento] = useState(false);
   const [exito, setExito] = useState(false);
+  const [ahora, setAhora] = useState(() => new Date());
+
+  useEffect(() => {
+    const intervalo = setInterval(() => {
+      const nuevaFecha = new Date();
+      setAhora(nuevaFecha);
+      if (tempHora && esHoraPasada(tempFecha, tempHora, nuevaFecha)) {
+        setTempHora("");
+      }
+    }, 30_000);
+    return () => clearInterval(intervalo);
+  }, [tempFecha, tempHora]);
 
   // Buscador: se queda con las especialidades que contienen lo escrito
   const listaFiltrada = especialidades.filter((e) =>
@@ -68,6 +85,21 @@ export default function Reservar() {
   };
 
   const confirmarFecha = () => {
+    const momento = new Date();
+    setAhora(momento);
+    if (!tempFecha || !tempHora || esHoraPasada(tempFecha, tempHora, momento)) {
+      setTempHora("");
+      Alert.alert("Horario no disponible", "Elige una fecha y hora futura.");
+      return;
+    }
+    if (
+      medico &&
+      obtenerCuposDisponibles(medico.nombre, tempFecha, tempHora) === 0
+    ) {
+      setTempHora("");
+      Alert.alert("Cupos agotados", "Ese horario ya completó sus cinco cupos. Elige otro.");
+      return;
+    }
     setFecha(tempFecha);
     setHora(tempHora);
     setVista("verificacion");
@@ -76,8 +108,24 @@ export default function Reservar() {
   const reservar = () => {
     if (!especialidad || !medico) return;
     const usuario = obtenerUsuarioActual();
+    const momento = new Date();
+    setAhora(momento);
+    if (!usuario) {
+      Alert.alert("Inicia sesión", "Debes iniciar sesión para reservar una cita.");
+      return;
+    }
+    if (esHoraPasada(fecha, hora, momento)) {
+      Alert.alert("Horario no disponible", "Elige una hora futura para reservar.");
+      abrirCalendario();
+      return;
+    }
+    if (obtenerCuposDisponibles(medico.nombre, fecha, hora) === 0) {
+      Alert.alert("Cupos agotados", "Ese horario ya completó sus cinco cupos. Elige otro.");
+      abrirCalendario();
+      return;
+    }
 
-    agregarCita({
+    const guardada = agregarCita({
       id: Date.now().toString(),
       especialidad: especialidad.nombre,
       servicio: especialidad.servicio,
@@ -87,10 +135,27 @@ export default function Reservar() {
       fecha,
       hora,
       estado: "PENDIENTE",
-      paciente: usuario ? usuario.nombre.toUpperCase() : "PACIENTE",
+      paciente: usuario.nombre.toUpperCase(),
       centro: CENTRO,
     });
+    if (!guardada) {
+      Alert.alert(
+        "No se pudo reservar",
+        "El horario se acaba de completar o tu sesión expiró. Elige otro horario."
+      );
+      abrirCalendario();
+      return;
+    }
     setExito(true);
+  };
+
+  const elegirFecha = (nuevaFecha: string) => {
+    const momento = new Date();
+    setAhora(momento);
+    setTempFecha(nuevaFecha);
+    if (tempHora && esHoraPasada(nuevaFecha, tempHora, momento)) {
+      setTempHora("");
+    }
   };
 
   const cerrarExito = () => {
@@ -108,7 +173,7 @@ export default function Reservar() {
       {/* ---------- Elegir fecha y hora ---------- */}
       {vista === "fecha" && (
         <ScrollView contentContainerClassName="pt-4 pb-10">
-          <Calendario fechaElegida={tempFecha} onElegir={setTempFecha} />
+          <Calendario fechaElegida={tempFecha} onElegir={elegirFecha} />
 
           <View className="flex-row items-center px-4 py-3 border-t border-b border-gray-200 mt-2">
             <View className="w-5 h-5 rounded-full border-2 border-sky-700" />
@@ -121,21 +186,49 @@ export default function Reservar() {
 
           <Text className="text-xl font-bold text-center my-3">Horas Disponibles</Text>
           <View className="flex-row flex-wrap px-3">
-            {HORAS_DISPONIBLES.map((h) => (
-              <Pressable
-                key={h}
-                onPress={() => setTempHora(h)}
-                className={`px-3 py-2 rounded-lg border-2 border-sky-700 mr-2 mb-2 ${
-                  tempHora === h ? "bg-sky-700" : "bg-white"
-                }`}
-              >
-                <Text
-                  className={`font-bold ${tempHora === h ? "text-white" : "text-sky-700"}`}
+            {HORAS_DISPONIBLES.map((h) => {
+              const pasada = esHoraPasada(tempFecha, h, ahora);
+              const cupos = medico
+                ? obtenerCuposDisponibles(medico.nombre, tempFecha, h)
+                : 0;
+              const agotada = cupos === 0;
+              const deshabilitada = pasada || agotada;
+              return (
+                <Pressable
+                  key={h}
+                  onPress={() => setTempHora(h)}
+                  disabled={deshabilitada}
+                  className={`px-3 py-2 rounded-lg border-2 mr-2 mb-2 ${
+                    deshabilitada
+                      ? "border-gray-300 bg-gray-200 opacity-50"
+                      : `border-sky-700 ${tempHora === h ? "bg-sky-700" : "bg-white"}`
+                  }`}
                 >
-                  {h}
-                </Text>
-              </Pressable>
-            ))}
+                  <Text
+                    className={`font-bold ${
+                      deshabilitada
+                        ? "text-gray-500"
+                        : tempHora === h
+                          ? "text-white"
+                          : "text-sky-700"
+                    }`}
+                  >
+                    {h}
+                  </Text>
+                  <Text
+                    className={`text-xs ${
+                      deshabilitada
+                        ? "text-gray-500"
+                        : tempHora === h
+                          ? "text-white"
+                          : "text-sky-700"
+                    }`}
+                  >
+                    {pasada ? "Pasada" : `Quedan ${cupos}`}
+                  </Text>
+                </Pressable>
+              );
+            })}
           </View>
 
           <View className="flex-row px-6 mt-4">
@@ -143,7 +236,11 @@ export default function Reservar() {
               <Boton
                 titulo="Confirmar"
                 onPress={confirmarFecha}
-                deshabilitado={tempFecha === "" || tempHora === ""}
+                deshabilitado={
+                  tempFecha === "" ||
+                  tempHora === "" ||
+                  esHoraPasada(tempFecha, tempHora, ahora)
+                }
               />
             </View>
             <View className="flex-1 ml-2">

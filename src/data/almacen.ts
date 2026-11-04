@@ -15,8 +15,27 @@ const usuarios: Usuario[] = [
 ];
 let usuarioActual: Usuario | null = null;
 let cuentaRecordada: Usuario | null = null;
-let citas: Cita[] = [];
+const citasPorUsuario = new Map<string, Cita[]>();
 let solicitudes: Solicitud[] = [];
+const CUPOS_POR_HORARIO = 5;
+
+function contarCitasEnHorario(medico: string, fecha: string, hora: string): number {
+  let total = 0;
+  for (const citasUsuario of citasPorUsuario.values()) {
+    total += citasUsuario.filter(
+      (cita) => cita.medico === medico && cita.fecha === fecha && cita.hora === hora
+    ).length;
+  }
+  return total;
+}
+
+export function obtenerCuposDisponibles(
+  medico: string,
+  fecha: string,
+  hora: string
+): number {
+  return Math.max(0, CUPOS_POR_HORARIO - contarCitasEnHorario(medico, fecha, hora));
+}
 
 // ---------- Usuarios ----------
 export function registrarUsuario(nuevo: Usuario): boolean {
@@ -76,16 +95,28 @@ export function iniciarSesionRecordada(): Usuario | null {
 }
 
 // ---------- Citas (crear, leer, eliminar) ----------
-export function agregarCita(cita: Cita) {
-  citas.push(cita);
+export function agregarCita(cita: Cita): boolean {
+  if (!usuarioActual) return false;
+  if (obtenerCuposDisponibles(cita.medico, cita.fecha, cita.hora) === 0) {
+    return false;
+  }
+  const citasUsuario = citasPorUsuario.get(usuarioActual.dni) ?? [];
+  citasPorUsuario.set(usuarioActual.dni, [...citasUsuario, cita]);
+  return true;
 }
 
 export function obtenerCitas(): Cita[] {
-  return [...citas];
+  if (!usuarioActual) return [];
+  return [...(citasPorUsuario.get(usuarioActual.dni) ?? [])];
 }
 
 export function cancelarCita(id: string) {
-  citas = citas.filter((c) => c.id !== id);
+  if (!usuarioActual) return;
+  const citasUsuario = citasPorUsuario.get(usuarioActual.dni) ?? [];
+  citasPorUsuario.set(
+    usuarioActual.dni,
+    citasUsuario.filter((cita) => cita.id !== id)
+  );
 }
 
 // ---------- Solicitudes (crear, leer, actualizar, eliminar) ----------

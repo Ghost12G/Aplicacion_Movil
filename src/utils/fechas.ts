@@ -40,6 +40,28 @@ export function proximaFechaLibre(diasAdelante: number): Date {
   return fecha;
 }
 
+export function esHoraPasada(
+  fecha: string,
+  hora: string,
+  ahora: Date = new Date()
+): boolean {
+  if (fecha !== formatearFecha(ahora)) return false;
+
+  const [horas, minutos] = hora.split(":").map(Number);
+  if (!Number.isInteger(horas) || !Number.isInteger(minutos)) return true;
+
+  return horas * 60 + minutos <= ahora.getHours() * 60 + ahora.getMinutes();
+}
+
+export function esDiaFinalizado(fecha: Date, ahora: Date = new Date()): boolean {
+  const esHoy =
+    fecha.getFullYear() === ahora.getFullYear() &&
+    fecha.getMonth() === ahora.getMonth() &&
+    fecha.getDate() === ahora.getDate();
+
+  return esHoy && ahora.getHours() >= 16;
+}
+
 export const HORAS_DISPONIBLES = [
   "08:20", "08:40", "09:00", "09:20", "09:40",
   "13:20", "13:40", "14:00", "14:20", "15:00",

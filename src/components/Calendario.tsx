@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { View, Text, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { esDiaAgotado, formatearFecha } from "../utils/fechas";
+import { esDiaAgotado, esDiaFinalizado, formatearFecha } from "../utils/fechas";
 
 interface Props {
   fechaElegida: string; // formato DD/MM/AAAA
@@ -71,11 +71,12 @@ export default function Calendario({ fechaElegida, onElegir }: Props) {
           const texto = formatearFecha(dia);
           const pasado = dia.getTime() < hoy.getTime();
           const agotado = !pasado && esDiaAgotado(dia);
+          const finalizado = esDiaFinalizado(dia);
           const elegido = texto === fechaElegida;
 
           let estilo = "border-2 border-sky-700";
           let colorTexto = "text-sky-700 font-bold";
-          if (pasado) {
+          if (pasado || finalizado) {
             estilo = "";
             colorTexto = "text-gray-300";
           } else if (agotado) {
@@ -89,9 +90,11 @@ export default function Calendario({ fechaElegida, onElegir }: Props) {
           return (
             <View key={texto} style={ANCHO_CELDA} className="items-center justify-center">
               <Pressable
-                disabled={pasado || agotado}
+                disabled={pasado || agotado || finalizado}
                 onPress={() => onElegir(texto)}
-                className={`w-11 h-11 rounded-full items-center justify-center ${estilo}`}
+                className={`w-11 h-11 rounded-full items-center justify-center ${
+                  finalizado ? "opacity-50" : ""
+                } ${estilo}`}
               >
                 <Text className={`text-base ${colorTexto}`}>{dia.getDate()}</Text>
               </Pressable>
