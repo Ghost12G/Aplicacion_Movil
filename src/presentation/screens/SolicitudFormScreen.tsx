@@ -1,13 +1,14 @@
-import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
-import { TipoSolicitud } from "../../domain/entities/Solicitud";
-import { solicitudService } from "../../infrastructure/container";
-import Boton from "../components/Boton";
+import { View, Text, Pressable } from "react-native";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import Cabecera from "../components/Cabecera";
 import InputField from "../components/InputField";
+import ScrollFormulario from "../components/ScrollFormulario";
+import Boton from "../components/Boton";
 import ModalExito from "../components/ModalExito";
 import { useFormulario } from "../hooks/useFormulario";
+import { solicitudService } from "../../infrastructure/container";
+import { TipoSolicitud } from "../../domain/entities/Solicitud";
 
 const tipos: TipoSolicitud[] = ["Consulta", "Reclamo", "Sugerencia"];
 
@@ -77,7 +78,7 @@ export default function SolicitudFormScreen() {
     <View className="flex-1 bg-white">
       <Cabecera titulo={existente ? "Editar solicitud" : "Nueva solicitud"} />
 
-      <ScrollView className="px-4 pt-6" contentContainerClassName="pb-10">
+      <ScrollFormulario className="px-4 pt-6" contentContainerClassName="pb-10">
         <InputField
           icono="person"
           placeholder="Nombre del cliente"
@@ -133,7 +134,7 @@ export default function SolicitudFormScreen() {
         />
         <View className="h-3" />
         <Boton titulo="Cancelar" variante="gris" onPress={() => router.back()} />
-      </ScrollView>
+      </ScrollFormulario>
 
       <ModalExito
         visible={guardado}

@@ -1,11 +1,11 @@
+import { useState } from "react";
+import { ScrollView, View, Text, Pressable, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Href, useRouter } from "expo-router";
-import { useState } from "react";
-import { Image, Pressable, ScrollView, Text, View } from "react-native";
-import { CENTRO } from "../../domain/constantes";
-import { authService } from "../../infrastructure/container";
 import MenuItem from "../components/MenuItem";
 import MenuLateral from "../components/MenuLateral";
+import { CENTRO } from "../../domain/constantes";
+import { authService } from "../../infrastructure/container";
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -41,11 +41,13 @@ export default function HomeScreen() {
           </Text>
         </View>
 
-        <Image
-          source={require("../../../assets/images/logo-clinic-digital-horizontal.png")}
-          className="w-28 h-12"
-          resizeMode="contain"
-        />
+        <Pressable onPress={() => router.push("/acerca")}>
+          <Image
+            source={require("../../../assets/images/logo-clinic-digital-horizontal.png")}
+            className="w-28 h-12"
+            resizeMode="contain"
+          />
+        </Pressable>
       </View>
 
       {/* Accesos */}

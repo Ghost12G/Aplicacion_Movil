@@ -1,10 +1,11 @@
-import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Alert, Pressable, ScrollView, Text, View } from "react-native";
-import { authService } from "../../infrastructure/container";
-import Boton from "../components/Boton";
+import { View, Text, Pressable, Alert } from "react-native";
+import { useRouter } from "expo-router";
 import InputField from "../components/InputField";
+import ScrollFormulario from "../components/ScrollFormulario";
+import Boton from "../components/Boton";
 import { useFormulario } from "../hooks/useFormulario";
+import { authService } from "../../infrastructure/container";
 
 type TipoDocumento = "D.N.I." | "C.E.";
 
@@ -99,7 +100,7 @@ export default function RegisterScreen() {
   };
 
   return (
-    <ScrollView
+    <ScrollFormulario
       className="flex-1 bg-cyan-50"
       contentContainerClassName="px-6 pt-16 pb-10"
     >
@@ -195,6 +196,6 @@ export default function RegisterScreen() {
           onPress={() => router.back()}
         />
       </View>
-    </ScrollView>
+    </ScrollFormulario>
   );
 }

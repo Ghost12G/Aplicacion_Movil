@@ -1,13 +1,14 @@
+import { useState } from "react";
+import { View, Text, Image, Pressable, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { useState } from "react";
-import { Alert, Image, Pressable, ScrollView, Text, View } from "react-native";
-import { Usuario } from "../../domain/entities/Usuario";
-import { authService } from "../../infrastructure/container";
-import AvisoInfo from "../components/AvisoInfo";
-import Boton from "../components/Boton";
 import InputField from "../components/InputField";
+import ScrollFormulario from "../components/ScrollFormulario";
+import Boton from "../components/Boton";
+import AvisoInfo from "../components/AvisoInfo";
 import { useFormulario } from "../hooks/useFormulario";
+import { authService } from "../../infrastructure/container";
+import { Usuario } from "../../domain/entities/Usuario";
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -56,7 +57,7 @@ export default function LoginScreen() {
   };
 
   return (
-    <ScrollView
+    <ScrollFormulario
       className="flex-1 bg-cyan-50"
       contentContainerClassName="px-6 pt-16 pb-8"
     >
@@ -139,6 +140,6 @@ export default function LoginScreen() {
 
       <AvisoInfo texto="Consultas al 000 0000, de lunes a sábado." />
       <AvisoInfo texto="Visítanos en la sede más cercana de tu clínica." />
-    </ScrollView>
+    </ScrollFormulario>
   );
 }

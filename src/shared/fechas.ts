@@ -25,8 +25,23 @@ export function fechaRelativa(meses: number, dia: number): Date {
   return new Date(hoy.getFullYear(), hoy.getMonth() + meses, dia);
 }
 
-// Regla de práctica: los días múltiplos de 4 aparecen "agotados"
+// Convierte "DD/MM/AAAA" y "HH:MM" en una fecha y hora reales
+export function fechaHoraDe(fecha: string, hora: string): Date {
+  const [dia, mes, anio] = fecha.split("/").map(Number);
+  const [horas, minutos] = hora.split(":").map(Number);
+  return new Date(anio, mes - 1, dia, horas, minutos);
+}
+
+// true si esa fecha y hora ya pasaron según el reloj del sistema
+export function yaPaso(fecha: string, hora: string, ahora: Date = new Date()): boolean {
+  return fechaHoraDe(fecha, hora).getTime() <= ahora.getTime();
+}
+
+// Un día aparece "agotado" si ya pasó su última hora (por ejemplo, hoy a las
+// 17:00) y, como regla de práctica, los días múltiplos de 4.
 export function esDiaAgotado(fecha: Date): boolean {
+  const ultimaHora = HORAS_DISPONIBLES[HORAS_DISPONIBLES.length - 1];
+  if (yaPaso(formatearFecha(fecha), ultimaHora)) return true;
   return fecha.getDate() % 4 === 0;
 }
 

@@ -8,7 +8,6 @@ export interface Usuario {
   correo: string;
 }
 
-// Datos que se pueden editar en "Mi Perfil"
 export type ContactoPerfil = Pick<
   Usuario,
   "operador" | "celular" | "telefonoFijo" | "correo"

@@ -2,6 +2,8 @@ import { Modalidad } from "./Especialidad";
 
 export interface Cita {
   id: string;
+  medicoId: string;
+  pacienteDni: string; // dueño de la cita
   especialidad: string;
   servicio: string;
   medico: string;

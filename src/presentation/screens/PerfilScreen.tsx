@@ -1,13 +1,14 @@
+import { useState } from "react";
+import { View, Text, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { useState } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
-import { authService, perfilService } from "../../infrastructure/container";
-import Boton from "../components/Boton";
 import Cabecera from "../components/Cabecera";
 import InputField from "../components/InputField";
+import ScrollFormulario from "../components/ScrollFormulario";
+import Boton from "../components/Boton";
 import ModalExito from "../components/ModalExito";
 import { useFormulario } from "../hooks/useFormulario";
+import { authService, perfilService } from "../../infrastructure/container";
 
 const operadores = ["Claro", "Movistar", "Entel", "Bitel"];
 
@@ -70,7 +71,7 @@ export default function PerfilScreen() {
     <View className="flex-1 bg-white">
       <Cabecera titulo="Mi Perfil" />
 
-      <ScrollView className="px-4 pt-5" contentContainerClassName="pb-10">
+      <ScrollFormulario className="px-4 pt-5" contentContainerClassName="pb-10">
         {usuario && (
           <View className="flex-row items-center bg-cyan-50 rounded-xl p-4 mb-5">
             <Ionicons name="person" size={40} color="#0369a1" />
@@ -131,7 +132,7 @@ export default function PerfilScreen() {
             <Boton titulo="Cancelar" variante="gris" onPress={() => router.back()} />
           </View>
         </View>
-      </ScrollView>
+      </ScrollFormulario>
 
       <ModalExito
         visible={guardado}

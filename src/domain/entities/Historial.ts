@@ -2,6 +2,7 @@ export type TipoAtencion = "C.Externa" | "Emergencia" | "Hospitalización" | "Ci
 
 export interface Atencion {
   id: string;
+  pacienteDni: string;
   tipo: TipoAtencion;
   especialidad: string;
   especialista: string;
@@ -18,6 +19,7 @@ export interface Medicamento {
 
 export interface Receta {
   id: string;
+  pacienteDni: string;
   numero: string;
   fecha: Date;
   especialidad: string;
@@ -29,6 +31,7 @@ export interface Receta {
 
 export interface Descanso {
   id: string;
+  pacienteDni: string;
   numero: string;
   desde: Date;
   dias: number;

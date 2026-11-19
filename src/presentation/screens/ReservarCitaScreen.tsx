@@ -1,22 +1,18 @@
+import { useState } from "react";
+import { View, Text, ScrollView, Pressable, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { useState } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
-import { CENTRO } from "../../domain/constantes";
-import { Especialidad, Medico } from "../../domain/entities/Especialidad";
-import { citaService } from "../../infrastructure/container";
-import {
-    HORAS_DISPONIBLES,
-    formatearFecha,
-    proximaFechaLibre,
-} from "../../shared/fechas";
-import Boton from "../components/Boton";
-import Buscador from "../components/Buscador";
 import Cabecera from "../components/Cabecera";
-import Calendario from "../components/Calendario";
-import ModalExito from "../components/ModalExito";
 import PasosReserva from "../components/PasosReserva";
 import TarjetaInfo from "../components/TarjetaInfo";
+import Calendario from "../components/Calendario";
+import Buscador from "../components/Buscador";
+import ModalExito from "../components/ModalExito";
+import Boton from "../components/Boton";
+import { CENTRO } from "../../domain/constantes";
+import { citaService } from "../../infrastructure/container";
+import { HORAS_DISPONIBLES } from "../../shared/fechas";
+import { Especialidad, Medico } from "../../domain/entities/Especialidad";
 
 type NombreIcono = keyof typeof Ionicons.glyphMap;
 
@@ -42,6 +38,15 @@ export default function ReservarCitaScreen() {
     e.nombre.toLowerCase().includes(busqueda.toLowerCase())
   );
 
+  // Horas que no se pueden elegir en la fecha seleccionada (ya pasaron u ocupadas)
+  const horasNoDisponibles =
+    medico && tempFecha !== "" ? citaService.horasNoDisponibles(medico.id, tempFecha) : [];
+
+  const textoSugerido = (m: Medico) => {
+    const sugerido = citaService.sugerirHorario(m);
+    return `${sugerido.fecha} - ${sugerido.hora}`;
+  };
+
   const paso = vista === "especialidad" ? 1 : vista === "medico" ? 2 : 3;
 
   const atras = () => {
@@ -58,8 +63,9 @@ export default function ReservarCitaScreen() {
 
   const elegirMedico = (m: Medico) => {
     setMedico(m);
-    setFecha(formatearFecha(proximaFechaLibre(m.diasAdelante)));
-    setHora(m.hora);
+    const sugerido = citaService.sugerirHorario(m); // primer horario libre
+    setFecha(sugerido.fecha);
+    setHora(sugerido.hora);
     setConsentimiento(false);
     setVista("verificacion");
   };
@@ -79,8 +85,13 @@ export default function ReservarCitaScreen() {
   const reservar = () => {
     if (!especialidad || !medico) return;
 
-    citaService.reservar({ especialidad, medico, fecha, hora });
-    setExito(true);
+    const resultado = citaService.reservar({ especialidad, medico, fecha, hora });
+
+    if (resultado.ok) {
+      setExito(true);
+    } else {
+      Alert.alert("No se pudo reservar", resultado.motivo);
+    }
   };
 
   const cerrarExito = () => {
@@ -98,7 +109,13 @@ export default function ReservarCitaScreen() {
       {/* ---------- Elegir fecha y hora ---------- */}
       {vista === "fecha" && (
         <ScrollView contentContainerClassName="pt-4 pb-10">
-          <Calendario fechaElegida={tempFecha} onElegir={setTempFecha} />
+          <Calendario
+            fechaElegida={tempFecha}
+            onElegir={(f) => {
+              setTempFecha(f);
+              setTempHora(""); // al cambiar de día se vuelve a elegir la hora
+            }}
+          />
 
           <View className="flex-row items-center px-4 py-3 border-t border-b border-gray-200 mt-2">
             <View className="w-5 h-5 rounded-full border-2 border-sky-700" />
@@ -109,23 +126,36 @@ export default function ReservarCitaScreen() {
             <Text className="ml-1">Elegido</Text>
           </View>
 
-          <Text className="text-xl font-bold text-center my-3">Horas Disponibles</Text>
+          <Text className="text-xl font-bold text-center mt-3">Horas Disponibles</Text>
+          <Text className="text-center text-gray-500 text-xs mb-3">
+            Las horas en gris ya pasaron o están ocupadas
+          </Text>
           <View className="flex-row flex-wrap px-3">
-            {HORAS_DISPONIBLES.map((h) => (
-              <Pressable
-                key={h}
-                onPress={() => setTempHora(h)}
-                className={`px-3 py-2 rounded-lg border-2 border-sky-700 mr-2 mb-2 ${
-                  tempHora === h ? "bg-sky-700" : "bg-white"
-                }`}
-              >
-                <Text
-                  className={`font-bold ${tempHora === h ? "text-white" : "text-sky-700"}`}
+            {HORAS_DISPONIBLES.map((h) => {
+              const noDisponible = horasNoDisponibles.includes(h);
+              const elegida = tempHora === h;
+
+              let fondo = "bg-white border-sky-700";
+              let colorTexto = "text-sky-700";
+              if (noDisponible) {
+                fondo = "bg-gray-200 border-gray-300";
+                colorTexto = "text-gray-400";
+              } else if (elegida) {
+                fondo = "bg-sky-700 border-sky-700";
+                colorTexto = "text-white";
+              }
+
+              return (
+                <Pressable
+                  key={h}
+                  disabled={noDisponible}
+                  onPress={() => setTempHora(h)}
+                  className={`px-3 py-2 rounded-lg border-2 mr-2 mb-2 ${fondo}`}
                 >
-                  {h}
-                </Text>
-              </Pressable>
-            ))}
+                  <Text className={`font-bold ${colorTexto}`}>{h}</Text>
+                </Pressable>
+              );
+            })}
           </View>
 
           <View className="flex-row px-6 mt-4">
@@ -207,7 +237,7 @@ export default function ReservarCitaScreen() {
                     <Text className="text-sky-800 mt-1">
                       Cita Sugerida:{" "}
                       <Text className="text-black">
-                        {formatearFecha(proximaFechaLibre(m.diasAdelante))} - {m.hora}
+                        {textoSugerido(m)}
                       </Text>
                     </Text>
                     <Text className="text-sky-800">

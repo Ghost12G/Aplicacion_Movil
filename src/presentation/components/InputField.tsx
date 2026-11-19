@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { View, TextInput, Text, Pressable } from "react-native";
+import { DeviceEventEmitter, View, TextInput, Text, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 interface Props {
@@ -51,6 +51,7 @@ export default function InputField({
             multiline={multilinea}
             textAlignVertical={multilinea ? "top" : "center"}
             autoCapitalize="none"
+            onFocus={() => DeviceEventEmitter.emit("campo-enfocado")}
           />
         </View>
 

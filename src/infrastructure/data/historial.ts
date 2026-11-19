@@ -1,19 +1,24 @@
 import { Atencion, Descanso, Receta } from "../../domain/entities/Historial";
 import { fechaRelativa } from "../../shared/fechas";
 
+// Estos datos de ejemplo pertenecen al usuario de demostración (DNI 12345678).
+// Los demás pacientes empiezan sin atenciones, recetas ni descansos.
+const DNI_DEMO = "12345678";
+
 // Datos de ejemplo (solo lectura)
 export const atenciones: Atencion[] = [
-  { id: "a1", tipo: "C.Externa", especialidad: "ODONTOLOGIA", especialista: "20871-CASTRO LEON PAOLA", actoMedico: "375914", fecha: fechaRelativa(-1, 18) },
-  { id: "a2", tipo: "C.Externa", especialidad: "ODONTOLOGIA", especialista: "20871-CASTRO LEON PAOLA", actoMedico: "372951", fecha: fechaRelativa(-1, 3) },
-  { id: "a3", tipo: "C.Externa", especialidad: "NUTRICION", especialista: "5778-RAMOS TORRES LUCIA", actoMedico: "372953", fecha: fechaRelativa(-2, 27) },
-  { id: "a4", tipo: "C.Externa", especialidad: "MEDICINA GENERAL", especialista: "94054-SOTO PRADO MARIA ELENA", actoMedico: "372076", fecha: fechaRelativa(-2, 12) },
-  { id: "a5", tipo: "Emergencia", especialidad: "EMERGENCIA", especialista: "31022-LUNA VERA RICARDO", actoMedico: "368120", fecha: fechaRelativa(-3, 8) },
-  { id: "a6", tipo: "Hospitalización", especialidad: "MEDICINA INTERNA", especialista: "40517-PAREDES LUNA ANA", actoMedico: "361744", fecha: fechaRelativa(-4, 21) },
+  { id: "a1", pacienteDni: DNI_DEMO, tipo: "C.Externa", especialidad: "ODONTOLOGIA", especialista: "20871-CASTRO LEON PAOLA", actoMedico: "375914", fecha: fechaRelativa(-1, 18) },
+  { id: "a2", pacienteDni: DNI_DEMO, tipo: "C.Externa", especialidad: "ODONTOLOGIA", especialista: "20871-CASTRO LEON PAOLA", actoMedico: "372951", fecha: fechaRelativa(-1, 3) },
+  { id: "a3", pacienteDni: DNI_DEMO, tipo: "C.Externa", especialidad: "NUTRICION", especialista: "5778-RAMOS TORRES LUCIA", actoMedico: "372953", fecha: fechaRelativa(-2, 27) },
+  { id: "a4", pacienteDni: DNI_DEMO, tipo: "C.Externa", especialidad: "MEDICINA GENERAL", especialista: "94054-SOTO PRADO MARIA ELENA", actoMedico: "372076", fecha: fechaRelativa(-2, 12) },
+  { id: "a5", pacienteDni: DNI_DEMO, tipo: "Emergencia", especialidad: "EMERGENCIA", especialista: "31022-LUNA VERA RICARDO", actoMedico: "368120", fecha: fechaRelativa(-3, 8) },
+  { id: "a6", pacienteDni: DNI_DEMO, tipo: "Hospitalización", especialidad: "MEDICINA INTERNA", especialista: "40517-PAREDES LUNA ANA", actoMedico: "361744", fecha: fechaRelativa(-4, 21) },
 ];
 
 export const recetas: Receta[] = [
   {
     id: "r1",
+    pacienteDni: DNI_DEMO,
     numero: "123944",
     fecha: fechaRelativa(-2, 21),
     especialidad: "ODONTOLOGIA",
@@ -31,6 +36,7 @@ export const recetas: Receta[] = [
   },
   {
     id: "r2",
+    pacienteDni: DNI_DEMO,
     numero: "125310",
     fecha: fechaRelativa(-1, 15),
     especialidad: "NUTRICION",
@@ -48,6 +54,7 @@ export const recetas: Receta[] = [
   },
   {
     id: "r3",
+    pacienteDni: DNI_DEMO,
     numero: "127005",
     fecha: fechaRelativa(0, 10),
     especialidad: "MEDICINA GENERAL",
@@ -71,6 +78,7 @@ export const recetas: Receta[] = [
   },
   {
     id: "r4",
+    pacienteDni: DNI_DEMO,
     numero: "128450",
     fecha: fechaRelativa(1, 5),
     especialidad: "DERMATOLOGIA",
@@ -89,6 +97,6 @@ export const recetas: Receta[] = [
 ];
 
 export const descansos: Descanso[] = [
-  { id: "d1", numero: "55102", desde: fechaRelativa(-1, 12), dias: 3, medico: "SOTO PRADO MARIA ELENA", especialidad: "MEDICINA GENERAL" },
-  { id: "d2", numero: "54377", desde: fechaRelativa(-3, 3), dias: 2, medico: "LUNA VERA RICARDO", especialidad: "EMERGENCIA" },
+  { id: "d1", pacienteDni: DNI_DEMO, numero: "55102", desde: fechaRelativa(-1, 12), dias: 3, medico: "SOTO PRADO MARIA ELENA", especialidad: "MEDICINA GENERAL" },
+  { id: "d2", pacienteDni: DNI_DEMO, numero: "54377", desde: fechaRelativa(-3, 3), dias: 2, medico: "LUNA VERA RICARDO", especialidad: "EMERGENCIA" },
 ];
