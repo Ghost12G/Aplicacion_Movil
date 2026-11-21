@@ -2,5 +2,5 @@
 export const CENTRO = "Nombre de tu clínica";
 
 // Cuántos pacientes puede atender un médico en un mismo horario.
-// En una consulta médica es 1: cada horario es para un solo paciente.
-export const CUPOS_POR_HORARIO = 1;
+// Con 2 cupos, dos pacientes distintos pueden reservar la misma franja horaria.
+export const CUPOS_POR_HORARIO = 2;
