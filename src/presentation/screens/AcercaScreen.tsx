@@ -9,17 +9,42 @@ const funciones: { icono: NombreIcono; texto: string }[] = [
   { icono: "calendar", texto: "Ver tus citas programadas y sus detalles" },
   { icono: "medkit", texto: "Consultar tus atenciones realizadas" },
   { icono: "document-text", texto: "Revisar tus recetas y descansos médicos" },
-  { icono: "create", texto: "Enviar, editar y eliminar solicitudes" },
+  { icono: "create", texto: "Enviar y consultar tus solicitudes desde tu cuenta" },
   { icono: "person", texto: "Actualizar tus datos de contacto" },
   { icono: "water", texto: "Hacer el test de riesgo de diabetes tipo 2" },
 ];
 
-const tecnologias = [
-  "React Native con Expo",
-  "TypeScript",
-  "Expo Router (navegación)",
-  "NativeWind (estilos)",
-  "Clean Architecture en 4 capas",
+const avisos = [
+  {
+    icono: "wifi" as const,
+    titulo: "Conexión a internet",
+    texto:
+      "Necesitas internet para confirmar reservas y enviar o editar solicitudes. El catálogo y las citas descargadas pueden consultarse desde este teléfono sin conexión.",
+  },
+  {
+    icono: "sync" as const,
+    titulo: "Cambios pendientes",
+    texto:
+      "Si cancelas una cita sin conexión, la cancelación queda pendiente. Se sincroniza al recuperar internet y el espacio no se libera en otros teléfonos hasta entonces.",
+  },
+  {
+    icono: "lock-closed" as const,
+    titulo: "Tu cuenta",
+    texto:
+      "Tus citas y solicitudes se guardan vinculadas a tu cuenta. Cierra sesión si compartes el teléfono con otra persona.",
+  },
+  {
+    icono: "chatbubble-ellipses" as const,
+    titulo: "Solicitudes",
+    texto:
+      "Puedes guardar y consultar tus solicitudes desde tu cuenta. Esta versión no muestra respuestas del personal de la clínica.",
+  },
+  {
+    icono: "medkit" as const,
+    titulo: "Información de salud",
+    texto:
+      "El test de riesgo de diabetes es orientativo y no reemplaza un diagnóstico ni una consulta con un profesional de salud.",
+  },
 ];
 
 export default function AcercaScreen() {
@@ -35,11 +60,12 @@ export default function AcercaScreen() {
         />
         <Text className="text-center text-gray-500 mb-5">Versión 1.0.0</Text>
 
-        <Text className="text-2xl font-bold text-sky-800 mb-2">¿Qué es Clinic Digital?</Text>
+        <Text className="text-2xl font-bold text-sky-800 mb-2">
+          Tu atención, más cerca
+        </Text>
         <Text className="text-base mb-5">
-          Clinic Digital es una aplicación móvil que permite a los pacientes de una clínica
-          gestionar sus servicios desde el celular: reservar citas, consultar su historial
-          y mantener sus datos al día, sin tener que acudir a la clínica.
+          Clinic Digital te ayuda a organizar tus citas y consultar información de tus
+          atenciones desde el celular.
         </Text>
 
         <Text className="text-2xl font-bold text-sky-800 mb-3">¿Qué puedes hacer?</Text>
@@ -50,19 +76,23 @@ export default function AcercaScreen() {
           </View>
         ))}
 
-        <Text className="text-2xl font-bold text-sky-800 mt-4 mb-3">Tecnología</Text>
-        {tecnologias.map((t) => (
-          <View key={t} className="flex-row items-center mb-2">
-            <Ionicons name="checkmark-circle" size={22} color="#16a34a" />
-            <Text className="ml-2 text-base">{t}</Text>
+        <Text className="text-2xl font-bold text-sky-800 mt-4 mb-3">
+          Información importante
+        </Text>
+        {avisos.map((aviso) => (
+          <View
+            key={aviso.titulo}
+            className="mb-3 rounded-2xl border border-sky-100 bg-sky-50 p-4"
+          >
+            <View className="mb-1 flex-row items-center">
+              <Ionicons name={aviso.icono} size={22} color="#0369a1" />
+              <Text className="ml-2 flex-1 text-base font-bold text-sky-900">
+                {aviso.titulo}
+              </Text>
+            </View>
+            <Text className="text-sm leading-5 text-slate-700">{aviso.texto}</Text>
           </View>
         ))}
-
-        <Text className="text-2xl font-bold text-sky-800 mt-4 mb-2">Proyecto académico</Text>
-        <Text className="text-base">
-          Desarrollado como proyecto del curso de Desarrollo de Aplicaciones Móviles. Los datos
-          se guardan solo en la memoria de la aplicación: al cerrarla, se pierden.
-        </Text>
       </ScrollView>
     </View>
   );

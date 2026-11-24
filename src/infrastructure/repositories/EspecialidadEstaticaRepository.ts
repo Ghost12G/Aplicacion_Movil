@@ -4,7 +4,7 @@ import { especialidades } from "../data/especialidades";
 
 // Entrega las especialidades de ejemplo (datos fijos)
 export class EspecialidadEstaticaRepository implements EspecialidadRepository {
-  obtenerTodas(): Especialidad[] {
+  async obtenerTodas(): Promise<Especialidad[]> {
     return especialidades;
   }
 }

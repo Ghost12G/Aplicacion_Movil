@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 export function useFormulario(valoresIniciales: Record<string, string>) {
   const [valores, setValores] = useState(valoresIniciales);
@@ -15,5 +15,9 @@ export function useFormulario(valoresIniciales: Record<string, string>) {
     setErrores({});
   };
 
-  return { valores, errores, setErrores, cambiar, limpiar };
+  const establecerValores = useCallback((nuevosValores: Record<string, string>) => {
+    setValores(nuevosValores);
+  }, []);
+
+  return { valores, errores, setErrores, cambiar, limpiar, establecerValores };
 }

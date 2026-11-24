@@ -4,25 +4,33 @@ import { SolicitudRepository } from "../../domain/repositories/SolicitudReposito
 export class SolicitudMemoriaRepository implements SolicitudRepository {
   private solicitudes: Solicitud[] = [];
 
-  agregar(solicitud: Solicitud): void {
+  async agregar(_usuarioUid: string, solicitud: Solicitud): Promise<void> {
     this.solicitudes.push(solicitud);
   }
 
-  listar(): Solicitud[] {
-    return [...this.solicitudes];
+  async listar(usuarioUid: string): Promise<Solicitud[]> {
+    return this.solicitudes.filter((solicitud) => solicitud.usuarioUid === usuarioUid);
   }
 
-  obtener(id: string): Solicitud | undefined {
-    return this.solicitudes.find((s) => s.id === id);
-  }
-
-  actualizar(id: string, datos: DatosSolicitud): void {
-    this.solicitudes = this.solicitudes.map((s) =>
-      s.id === id ? { ...s, ...datos } : s
+  async obtener(usuarioUid: string, id: string): Promise<Solicitud | undefined> {
+    return this.solicitudes.find(
+      (solicitud) => solicitud.id === id && solicitud.usuarioUid === usuarioUid
     );
   }
 
-  eliminar(id: string): void {
-    this.solicitudes = this.solicitudes.filter((s) => s.id !== id);
+  async actualizar(
+    usuarioUid: string,
+    id: string,
+    datos: DatosSolicitud
+  ): Promise<void> {
+    this.solicitudes = this.solicitudes.map((s) =>
+      s.id === id && s.usuarioUid === usuarioUid ? { ...s, ...datos } : s
+    );
+  }
+
+  async eliminar(usuarioUid: string, id: string): Promise<void> {
+    this.solicitudes = this.solicitudes.filter(
+      (solicitud) => solicitud.id !== id || solicitud.usuarioUid !== usuarioUid
+    );
   }
 }

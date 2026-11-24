@@ -12,19 +12,12 @@ export class PerfilService {
     this.sesion = sesion;
   }
 
-  actualizarContacto(datos: ContactoPerfil): Usuario | null {
+  async actualizarContacto(datos: ContactoPerfil): Promise<Usuario | null> {
     const actual = this.sesion.obtenerUsuario();
     if (!actual) return null;
 
-    const actualizado = this.usuarios.actualizarContacto(actual.dni, datos);
-    if (!actualizado) return null;
-
+    const actualizado = await this.usuarios.actualizarContacto(actual.uid, datos);
     this.sesion.establecerUsuario(actualizado);
-
-    const recordada = this.sesion.obtenerCuentaRecordada();
-    if (recordada && recordada.dni === actualizado.dni) {
-      this.sesion.guardarCuentaRecordada(actualizado);
-    }
     return actualizado;
   }
 }

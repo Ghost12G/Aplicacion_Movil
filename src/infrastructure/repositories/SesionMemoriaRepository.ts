@@ -1,10 +1,9 @@
 import { Usuario } from "../../domain/entities/Usuario";
 import { SesionRepository } from "../../domain/repositories/SesionRepository";
 
-// Guarda la sesión y la cuenta recordada EN MEMORIA.
+// Guarda la sesión EN MEMORIA mientras la app está abierta.
 export class SesionMemoriaRepository implements SesionRepository {
   private usuario: Usuario | null = null;
-  private cuentaRecordada: Usuario | null = null;
 
   obtenerUsuario(): Usuario | null {
     return this.usuario;
@@ -12,13 +11,5 @@ export class SesionMemoriaRepository implements SesionRepository {
 
   establecerUsuario(usuario: Usuario | null): void {
     this.usuario = usuario;
-  }
-
-  obtenerCuentaRecordada(): Usuario | null {
-    return this.cuentaRecordada;
-  }
-
-  guardarCuentaRecordada(usuario: Usuario | null): void {
-    this.cuentaRecordada = usuario;
   }
 }

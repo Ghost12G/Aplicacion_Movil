@@ -23,6 +23,13 @@ export type ResultadoReserva =
   | { ok: true; cita: Cita }
   | { ok: false; motivo: string };
 
+function generarIdCita(): string {
+  const valorAleatorio = Math.floor(
+    Math.random() * Number.MAX_SAFE_INTEGER
+  ).toString(36);
+  return `${Date.now().toString(36)}-${valorAleatorio}`;
+}
+
 // Reservar, consultar y cancelar citas
 export class CitaService {
   private citas: CitaRepository;
@@ -39,48 +46,76 @@ export class CitaService {
     this.sesion = sesion;
   }
 
-  obtenerEspecialidades(): Especialidad[] {
+  obtenerEspecialidades(): Promise<Especialidad[]> {
     return this.especialidades.obtenerTodas();
   }
 
   // Solo las citas del paciente que inició sesión
-  listar(): Cita[] {
+  async listar(): Promise<Cita[]> {
     const usuario = this.sesion.obtenerUsuario();
     if (!usuario) return [];
-    return this.citas.listar().filter((c) => c.pacienteDni === usuario.dni);
+    const citas = await this.citas.listar();
+    return citas.filter(
+      (c) =>
+        c.pacienteUid === usuario.uid ||
+        (!c.pacienteUid && c.pacienteDni === usuario.dni)
+    );
   }
 
-  // Cuántas citas tiene ya un médico en esa fecha y hora (de todos los pacientes)
-  private citasEnHorario(medicoId: string, fecha: string, hora: string): number {
-    return this.citas
-      .listar()
-      .filter((c) => c.medicoId === medicoId && c.fecha === fecha && c.hora === hora).length;
+  private contarCitasEnHorario(
+    citas: Cita[],
+    medicoId: string,
+    fecha: string,
+    hora: string,
+    excluirCitaId?: string
+  ): number {
+    return citas.filter(
+      (c) =>
+        c.id !== excluirCitaId &&
+        c.medicoId === medicoId &&
+        c.fecha === fecha &&
+        c.hora === hora
+    ).length;
   }
 
   // Un horario está disponible si no pasó y todavía hay cupo con ese médico
-  estaDisponible(medicoId: string, fecha: string, hora: string): boolean {
+  async estaDisponible(medicoId: string, fecha: string, hora: string): Promise<boolean> {
     if (yaPaso(fecha, hora)) return false;
-    return this.citasEnHorario(medicoId, fecha, hora) < CUPOS_POR_HORARIO;
+    const citas = await this.citas.listar();
+    return this.contarCitasEnHorario(citas, medicoId, fecha, hora) < CUPOS_POR_HORARIO;
   }
 
   // Horas que no se pueden elegir: ya pasaron o ya están ocupadas
-  horasNoDisponibles(medicoId: string, fecha: string): string[] {
-    return HORAS_DISPONIBLES.filter((h) => !this.estaDisponible(medicoId, fecha, h));
+  async horasNoDisponibles(
+    medicoId: string,
+    fecha: string,
+    excluirCitaId?: string
+  ): Promise<string[]> {
+    const citas = await this.citas.listar();
+    return HORAS_DISPONIBLES.filter(
+      (hora) =>
+        yaPaso(fecha, hora) ||
+        this.contarCitasEnHorario(citas, medicoId, fecha, hora, excluirCitaId) >=
+          CUPOS_POR_HORARIO
+    );
   }
 
   // Primer horario libre cercano a la cita sugerida del médico
-  sugerirHorario(medico: Medico): { fecha: string; hora: string } {
+  async sugerirHorario(medico: Medico): Promise<{ fecha: string; hora: string }> {
+    const citas = await this.citas.listar();
     for (let extra = 0; extra < 14; extra++) {
       const fecha = formatearFecha(proximaFechaLibre(medico.diasAdelante + extra));
-      const hora = [medico.hora, ...HORAS_DISPONIBLES].find((h) =>
-        this.estaDisponible(medico.id, fecha, h)
+      const hora = [medico.hora, ...HORAS_DISPONIBLES].find(
+        (hora) =>
+          !yaPaso(fecha, hora) &&
+          this.contarCitasEnHorario(citas, medico.id, fecha, hora) < CUPOS_POR_HORARIO
       );
       if (hora) return { fecha, hora };
     }
     return { fecha: formatearFecha(proximaFechaLibre(medico.diasAdelante)), hora: medico.hora };
   }
 
-  reservar(datos: DatosReserva): ResultadoReserva {
+  async reservar(datos: DatosReserva): Promise<ResultadoReserva> {
     const usuario = this.sesion.obtenerUsuario();
     if (!usuario) {
       return { ok: false, motivo: "Debes iniciar sesión para reservar una cita." };
@@ -91,23 +126,12 @@ export class CitaService {
       return { ok: false, motivo: "Esa fecha y hora ya pasaron. Elige un horario disponible." };
     }
 
-    // Regla 2: el médico atiende a un número limitado de pacientes por horario
-    if (this.citasEnHorario(datos.medico.id, datos.fecha, datos.hora) >= CUPOS_POR_HORARIO) {
-      return { ok: false, motivo: "Ese horario ya fue reservado por otro paciente. Elige otra hora." };
-    }
-
-    // Regla 3: el paciente no puede tener dos citas a la misma fecha y hora
-    const choque = this.citas
-      .listar()
-      .some((c) => c.pacienteDni === usuario.dni && c.fecha === datos.fecha && c.hora === datos.hora);
-    if (choque) {
-      return { ok: false, motivo: "Ya tienes otra cita en esa fecha y hora." };
-    }
-
     const cita: Cita = {
-      id: Date.now().toString(),
+      id: generarIdCita(),
+      pacienteUid: usuario.uid,
       medicoId: datos.medico.id,
       pacienteDni: usuario.dni,
+      especialidadId: datos.especialidad.id,
       especialidad: datos.especialidad.nombre,
       servicio: datos.especialidad.servicio,
       medico: datos.medico.nombre,
@@ -120,13 +144,60 @@ export class CitaService {
       centro: CENTRO,
     };
 
-    this.citas.agregar(cita);
+    const resultado = await this.citas.agregarSiDisponible(cita, CUPOS_POR_HORARIO);
+    if (!resultado.ok) {
+      const motivo =
+        resultado.motivo === "especialidad-ya-tiene-cita"
+          ? "Ya tienes una cita activa en esta especialidad. Cancélala antes de reservar otra."
+          : resultado.motivo === "cita-duplicada"
+            ? "Ya tienes otra cita en esa fecha y hora."
+            : "Ese horario ya fue reservado por otro paciente. Elige otra hora.";
+      return { ok: false, motivo };
+    }
+
     return { ok: true, cita };
   }
 
+  async reprogramar(
+    id: string,
+    especialidadId: string,
+    fecha: string,
+    hora: string
+  ): Promise<ResultadoReserva> {
+    const usuario = this.sesion.obtenerUsuario();
+    if (!usuario) {
+      return { ok: false, motivo: "Debes iniciar sesión para reprogramar una cita." };
+    }
+    if (yaPaso(fecha, hora)) {
+      return { ok: false, motivo: "Esa fecha y hora ya pasaron. Elige otro horario." };
+    }
+
+    const resultado = await this.citas.reprogramarSiDisponible(
+      id,
+      usuario.uid,
+      usuario.dni,
+      especialidadId,
+      fecha,
+      hora,
+      CUPOS_POR_HORARIO
+    );
+    if (!resultado.ok) {
+      const motivo =
+        resultado.motivo === "cita-no-encontrada"
+          ? "No se encontró tu cita. Actualiza la lista e inténtalo de nuevo."
+          : resultado.motivo === "cita-duplicada"
+            ? "Ya tienes otra cita en esa fecha y hora."
+            : "Ese horario ya está lleno. Elige otro horario.";
+      return { ok: false, motivo };
+    }
+
+    return { ok: true, cita: resultado.cita };
+  }
+
   // Solo se puede cancelar una cita propia
-  cancelar(id: string): void {
-    const esPropia = this.listar().some((c) => c.id === id);
-    if (esPropia) this.citas.eliminar(id);
+  async cancelar(id: string): Promise<void> {
+    const esPropia = (await this.listar()).some((c) => c.id === id);
+    const usuario = this.sesion.obtenerUsuario();
+    if (esPropia && usuario) await this.citas.eliminar(id, usuario.uid);
   }
 }

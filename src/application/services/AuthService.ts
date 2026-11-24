@@ -1,8 +1,8 @@
-import { Usuario } from "../../domain/entities/Usuario";
+import { DatosRegistro, Usuario } from "../../domain/entities/Usuario";
 import { UsuarioRepository } from "../../domain/repositories/UsuarioRepository";
 import { SesionRepository } from "../../domain/repositories/SesionRepository";
 
-// Registro, inicio de sesión y cuenta recordada
+// Registro, inicio de sesión y cierre de sesión
 export class AuthService {
   private usuarios: UsuarioRepository;
   private sesion: SesionRepository;
@@ -12,40 +12,35 @@ export class AuthService {
     this.sesion = sesion;
   }
 
-  // Devuelve false si el documento ya está registrado
-  registrar(usuario: Usuario): boolean {
-    return this.usuarios.registrar(usuario);
-  }
-
-  iniciarSesion(dni: string, password: string, recordar: boolean): Usuario | null {
-    const usuario = this.usuarios.buscarPorCredenciales(dni, password);
+  async registrar(datos: DatosRegistro): Promise<Usuario> {
+    const usuario = await this.usuarios.registrar(datos);
     this.sesion.establecerUsuario(usuario);
-
-    if (usuario) {
-      this.sesion.guardarCuentaRecordada(recordar ? usuario : null);
-    }
     return usuario;
   }
 
-  iniciarSesionRecordada(): Usuario | null {
-    const cuenta = this.sesion.obtenerCuentaRecordada();
-    this.sesion.establecerUsuario(cuenta);
-    return cuenta;
+  async iniciarSesion(correo: string, password: string): Promise<Usuario> {
+    const usuario = await this.usuarios.iniciarSesion(correo, password);
+    this.sesion.establecerUsuario(usuario);
+    return usuario;
   }
 
-  cerrarSesion(): void {
+  // Al abrir la app: si ya había una sesión iniciada, la recupera
+  async restaurarSesion(): Promise<Usuario | null> {
+    const usuario = await this.usuarios.restaurarSesion();
+    this.sesion.establecerUsuario(usuario);
+    return usuario;
+  }
+
+  async cerrarSesion(): Promise<void> {
+    await this.usuarios.cerrarSesion();
     this.sesion.establecerUsuario(null);
+  }
+
+  recuperarPassword(correo: string): Promise<void> {
+    return this.usuarios.recuperarPassword(correo);
   }
 
   obtenerUsuarioActual(): Usuario | null {
     return this.sesion.obtenerUsuario();
-  }
-
-  obtenerCuentaRecordada(): Usuario | null {
-    return this.sesion.obtenerCuentaRecordada();
-  }
-
-  olvidarCuenta(): void {
-    this.sesion.guardarCuentaRecordada(null);
   }
 }

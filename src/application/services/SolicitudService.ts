@@ -13,37 +13,50 @@ export class SolicitudService {
     this.sesion = sesion;
   }
 
-  listar(): Solicitud[] {
+  async listar(): Promise<Solicitud[]> {
     const usuario = this.sesion.obtenerUsuario();
-    if (!usuario) return [];
-    return this.solicitudes.listar().filter((s) => s.usuarioDni === usuario.dni);
+    if (!usuario) throw new Error("Debes iniciar sesión para consultar tus solicitudes.");
+    return this.solicitudes.listar(usuario.uid);
   }
 
-  obtener(id: string): Solicitud | undefined {
-    return this.listar().find((s) => s.id === id);
+  async obtener(id: string): Promise<Solicitud | undefined> {
+    const usuario = this.sesion.obtenerUsuario();
+    if (!usuario) throw new Error("Debes iniciar sesión para consultar esta solicitud.");
+    return this.solicitudes.obtener(usuario.uid, id);
   }
 
-  crear(datos: DatosSolicitud): Solicitud | null {
+  obtenerDatosContacto(): { nombre: string; telefono: string } {
     const usuario = this.sesion.obtenerUsuario();
-    if (!usuario) return null;
+    return {
+      nombre: usuario?.nombre ?? "",
+      telefono: usuario?.celular ?? "",
+    };
+  }
+
+  async crear(datos: DatosSolicitud): Promise<Solicitud> {
+    const usuario = this.sesion.obtenerUsuario();
+    if (!usuario) throw new Error("Debes iniciar sesión para enviar una solicitud.");
 
     const solicitud: Solicitud = {
-      id: Date.now().toString(),
+      id: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 12)}`,
       fecha: formatearFecha(new Date()),
       usuarioDni: usuario.dni,
+      usuarioUid: usuario.uid,
       ...datos,
     };
-    this.solicitudes.agregar(solicitud);
+    await this.solicitudes.agregar(usuario.uid, solicitud);
     return solicitud;
   }
 
-  actualizar(id: string, datos: DatosSolicitud): void {
-    if (!this.obtener(id)) return;
-    this.solicitudes.actualizar(id, datos);
+  async actualizar(id: string, datos: DatosSolicitud): Promise<void> {
+    const usuario = this.sesion.obtenerUsuario();
+    if (!usuario) throw new Error("Debes iniciar sesión para actualizar esta solicitud.");
+    await this.solicitudes.actualizar(usuario.uid, id, datos);
   }
 
-  eliminar(id: string): void {
-    if (!this.obtener(id)) return;
-    this.solicitudes.eliminar(id);
+  async eliminar(id: string): Promise<void> {
+    const usuario = this.sesion.obtenerUsuario();
+    if (!usuario) throw new Error("Debes iniciar sesión para eliminar esta solicitud.");
+    await this.solicitudes.eliminar(usuario.uid, id);
   }
 }

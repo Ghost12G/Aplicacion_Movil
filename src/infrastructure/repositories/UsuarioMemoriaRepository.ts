@@ -1,40 +1,73 @@
-import { ContactoPerfil, Usuario } from "../../domain/entities/Usuario";
+import { ContactoPerfil, DatosRegistro, Usuario } from "../../domain/entities/Usuario";
 import { UsuarioRepository } from "../../domain/repositories/UsuarioRepository";
+
+type UsuarioGuardado = Usuario & { password: string };
 
 // Guarda los usuarios EN MEMORIA: se pierden al cerrar la aplicación.
 export class UsuarioMemoriaRepository implements UsuarioRepository {
-  private usuarios: Usuario[] = [
+  private usuarios: UsuarioGuardado[] = [
     {
+      uid: "demo-12345678",
       dni: "12345678",
       password: "1234",
       nombre: "Jose Palacios",
       operador: "Claro",
       celular: "999888777",
-      telefonoFijo: "044222333",
       correo: "jose.palacios@correo.com",
     },
   ];
 
-  registrar(usuario: Usuario): boolean {
-    const existe = this.usuarios.some((u) => u.dni === usuario.dni);
-    if (existe) return false;
-
-    this.usuarios.push(usuario);
-    return true;
-  }
-
-  buscarPorCredenciales(dni: string, password: string): Usuario | null {
-    const encontrado = this.usuarios.find(
-      (u) => u.dni === dni && u.password === password
+  async registrar(datos: DatosRegistro): Promise<Usuario> {
+    const correo = datos.correo.trim();
+    const existe = this.usuarios.some(
+      (usuario) => usuario.dni === datos.dni || usuario.correo.toLowerCase() === correo.toLowerCase()
     );
-    return encontrado ?? null;
+    if (existe) throw new Error("Ya existe una cuenta con ese correo o documento.");
+
+    const usuario: UsuarioGuardado = {
+      uid: Date.now().toString(),
+      dni: datos.dni,
+      password: datos.password,
+      nombre: datos.nombre,
+      correo,
+      operador: "Claro",
+      celular: datos.celular,
+    };
+    this.usuarios.push(usuario);
+    return this.sinPassword(usuario);
   }
 
-  actualizarContacto(dni: string, datos: ContactoPerfil): Usuario | null {
-    const posicion = this.usuarios.findIndex((u) => u.dni === dni);
-    if (posicion === -1) return null;
+  async iniciarSesion(correo: string, password: string): Promise<Usuario> {
+    const encontrado = this.usuarios.find(
+      (usuario) =>
+        usuario.correo.toLowerCase() === correo.trim().toLowerCase() &&
+        usuario.password === password
+    );
+    if (!encontrado) throw new Error("Correo o contraseña incorrectos.");
+    return this.sinPassword(encontrado);
+  }
+
+  cerrarSesion(): Promise<void> {
+    return Promise.resolve();
+  }
+
+  async restaurarSesion(): Promise<Usuario | null> {
+    return null;
+  }
+
+  async recuperarPassword(): Promise<void> {
+    throw new Error("La recuperación de contraseña requiere Firebase.");
+  }
+
+  async actualizarContacto(uid: string, datos: ContactoPerfil): Promise<Usuario> {
+    const posicion = this.usuarios.findIndex((usuario) => usuario.uid === uid);
+    if (posicion === -1) throw new Error("No se encontró el usuario.");
 
     this.usuarios[posicion] = { ...this.usuarios[posicion], ...datos };
-    return this.usuarios[posicion];
+    return this.sinPassword(this.usuarios[posicion]);
+  }
+
+  private sinPassword({ password: _password, ...usuario }: UsuarioGuardado): Usuario {
+    return usuario;
   }
 }

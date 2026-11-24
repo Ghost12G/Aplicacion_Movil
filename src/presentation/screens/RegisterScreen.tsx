@@ -1,11 +1,13 @@
 import { useState } from "react";
-import { View, Text, Pressable, Alert } from "react-native";
+import { View, Text, Pressable } from "react-native";
 import { useRouter } from "expo-router";
 import InputField from "../components/InputField";
 import ScrollFormulario from "../components/ScrollFormulario";
 import Boton from "../components/Boton";
+import ModalExito from "../components/ModalExito";
 import { useFormulario } from "../hooks/useFormulario";
-import { authService } from "../../infrastructure/container";
+import { authService, citaFirestoreSyncService } from "../../infrastructure/container";
+import { mensajeDeError } from "../../shared/errores";
 
 type TipoDocumento = "D.N.I." | "C.E.";
 
@@ -14,6 +16,10 @@ const tiposDocumento: TipoDocumento[] = ["D.N.I.", "C.E."];
 export default function RegisterScreen() {
   const router = useRouter();
   const [tipoDoc, setTipoDoc] = useState<TipoDocumento>("D.N.I.");
+  const [cargando, setCargando] = useState(false);
+  const [mostrarMensaje, setMostrarMensaje] = useState(false);
+  const [registroCorrecto, setRegistroCorrecto] = useState(false);
+  const [mensaje, setMensaje] = useState("");
   const { valores, errores, setErrores, cambiar } = useFormulario({
     nombre: "",
     documento: "",
@@ -65,8 +71,8 @@ export default function RegisterScreen() {
 
     if (valores.password.trim() === "") {
       nuevosErrores.password = "La contraseña es obligatoria";
-    } else if (valores.password.length < 4) {
-      nuevosErrores.password = "Mínimo 4 caracteres";
+    } else if (valores.password.length < 6) {
+      nuevosErrores.password = "Mínimo 6 caracteres";
     }
 
     if (valores.confirmar !== valores.password) {
@@ -77,26 +83,36 @@ export default function RegisterScreen() {
     return Object.keys(nuevosErrores).length === 0;
   };
 
-  const registrar = () => {
+  const registrar = async () => {
     if (!validar()) return;
 
-    const guardado = authService.registrar({
-      dni: valores.documento,
-      password: valores.password,
-      nombre: valores.nombre.trim(),
-      operador: "Claro",
-      celular: valores.celular,
-      telefonoFijo: "",
-      correo: valores.correo.trim(),
-    });
-
-    if (!guardado) {
-      setErrores({ documento: "Este documento ya está registrado" });
-      return;
+    setCargando(true);
+    try {
+      await authService.registrar({
+        nombre: valores.nombre.trim(),
+        dni: valores.documento,
+        correo: valores.correo.trim(),
+        password: valores.password,
+        celular: valores.celular,
+      });
+      void citaFirestoreSyncService.sincronizarPendientes().catch((error: unknown) => {
+        console.error("Las citas siguen pendientes de sincronización.", error);
+      });
+      setRegistroCorrecto(true);
+      setMensaje("Tu cuenta fue creada correctamente. Ya puedes empezar a usar Clinic Digital.");
+      setMostrarMensaje(true);
+    } catch (error) {
+      setRegistroCorrecto(false);
+      setMensaje(mensajeDeError(error));
+      setMostrarMensaje(true);
+    } finally {
+      setCargando(false);
     }
+  };
 
-    Alert.alert("Cuenta creada", "Ahora inicia sesión con tu documento y contraseña");
-    router.replace("/login");
+  const cerrarMensaje = () => {
+    setMostrarMensaje(false);
+    if (registroCorrecto) router.replace("/home");
   };
 
   return (
@@ -188,7 +204,11 @@ export default function RegisterScreen() {
           error={errores.confirmar}
         />
 
-        <Boton titulo="Registrarme" onPress={registrar} />
+        <Boton
+          titulo={cargando ? "Creando cuenta..." : "Registrarme"}
+          onPress={registrar}
+          deshabilitado={cargando}
+        />
         <View className="h-3" />
         <Boton
           titulo="Volver"
@@ -196,6 +216,14 @@ export default function RegisterScreen() {
           onPress={() => router.back()}
         />
       </View>
+
+      <ModalExito
+        visible={mostrarMensaje}
+        titulo={registroCorrecto ? "¡Bienvenido(a)!" : "No se pudo crear la cuenta"}
+        mensaje={mensaje}
+        tipo={registroCorrecto ? "exito" : "error"}
+        onCerrar={cerrarMensaje}
+      />
     </ScrollFormulario>
   );
 }

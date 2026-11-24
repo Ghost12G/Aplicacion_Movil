@@ -11,6 +11,7 @@ interface Props {
   teclado?: "default" | "numeric" | "email-address";
   multilinea?: boolean;
   error?: string;
+  editable?: boolean;
 }
 
 export default function InputField({
@@ -22,6 +23,7 @@ export default function InputField({
   teclado = "default",
   multilinea = false,
   error,
+  editable = true,
 }: Props) {
   const [ocultar, setOcultar] = useState(esPassword);
   const tieneError = Boolean(error);
@@ -46,6 +48,7 @@ export default function InputField({
             placeholder={placeholder}
             value={value}
             onChangeText={onChangeText}
+            editable={editable}
             secureTextEntry={ocultar}
             keyboardType={teclado}
             multiline={multilinea}

@@ -1,0 +1,71 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Cada usuario solo puede leer y escribir su propio perfil
+    match /usuarios/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+
+      function esPropietario() {
+        return request.auth != null && request.auth.uid == uid;
+      }
+
+      function rutaCita(citaId) {
+        return /databases/$(database)/documents/usuarios/$(uid)/citas/$(citaId);
+      }
+
+      function rutaBloqueo(especialidadId) {
+        return /databases/$(database)/documents/usuarios/$(uid)/bloqueos_especialidad/$(especialidadId);
+      }
+
+      match /citas/{citaId} {
+        allow read: if esPropietario();
+        allow create, update: if esPropietario()
+          && request.resource.data.pacienteUid == uid
+          && request.resource.data.id == citaId
+          && request.resource.data.especialidadId is string
+          && existsAfter(rutaBloqueo(request.resource.data.especialidadId))
+          && getAfter(rutaBloqueo(request.resource.data.especialidadId)).data.citaId == citaId
+          && getAfter(rutaBloqueo(request.resource.data.especialidadId)).data.pacienteUid == uid;
+        allow delete: if esPropietario()
+          && (
+            !("especialidadId" in resource.data)
+            || !exists(rutaBloqueo(resource.data.especialidadId))
+            || get(rutaBloqueo(resource.data.especialidadId)).data.citaId != citaId
+            || !existsAfter(rutaBloqueo(resource.data.especialidadId))
+          );
+      }
+
+      match /bloqueos_especialidad/{especialidadId} {
+        allow read: if esPropietario();
+        allow create: if esPropietario()
+          && request.resource.data.citaId is string
+          && request.resource.data.especialidadId == especialidadId
+          && request.resource.data.pacienteUid == uid
+          && existsAfter(rutaCita(request.resource.data.citaId))
+          && getAfter(rutaCita(request.resource.data.citaId)).data.id == request.resource.data.citaId
+          && getAfter(rutaCita(request.resource.data.citaId)).data.especialidadId == especialidadId
+          && getAfter(rutaCita(request.resource.data.citaId)).data.pacienteUid == uid;
+        allow update: if false;
+        allow delete: if esPropietario()
+          && resource.data.especialidadId == especialidadId
+          && resource.data.citaId is string
+          && !existsAfter(rutaCita(resource.data.citaId));
+      }
+
+      match /solicitudes/{solicitudId} {
+        allow read, delete: if esPropietario();
+        allow create, update: if esPropietario()
+          && request.resource.data.id == solicitudId
+          && request.resource.data.usuarioUid == uid
+          && request.resource.data.usuarioDni is string
+          && request.resource.data.nombre is string
+          && request.resource.data.telefono is string
+          && request.resource.data.tipo in ['Consulta', 'Reclamo', 'Sugerencia']
+          && request.resource.data.descripcion is string
+          && request.resource.data.fecha is string;
+      }
+    }
+
+  }
+}

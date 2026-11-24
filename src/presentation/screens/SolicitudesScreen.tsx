@@ -1,20 +1,28 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Alert, Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
 import { Solicitud } from "../../domain/entities/Solicitud";
 import Buscador from "../components/Buscador";
 import Cabecera from "../components/Cabecera";
 import Pestanas from "../components/Pestanas";
+import ModalExito from "../components/ModalExito";
 import { useSolicitudes } from "../hooks/useSolicitudes";
 
 const filtros = ["Todas", "Consulta", "Reclamo", "Sugerencia"];
 
 export default function SolicitudesScreen() {
   const router = useRouter();
-  const { solicitudes, eliminar: eliminarPorId } = useSolicitudes();
+  const {
+    solicitudes,
+    cargando,
+    error,
+    cargar,
+    eliminar: eliminarPorId,
+  } = useSolicitudes();
   const [filtro, setFiltro] = useState("Todas");
   const [busqueda, setBusqueda] = useState("");
+  const [solicitudAEliminar, setSolicitudAEliminar] = useState<Solicitud | null>(null);
 
   const visibles = solicitudes.filter(
     (s) =>
@@ -23,16 +31,7 @@ export default function SolicitudesScreen() {
   );
 
   const eliminar = (solicitud: Solicitud) => {
-    Alert.alert("Eliminar solicitud", "¿Seguro que quieres eliminar esta solicitud?", [
-      { text: "Cancelar" },
-      {
-        text: "Eliminar",
-        style: "destructive",
-        onPress: () => {
-          eliminarPorId(solicitud.id);
-        },
-      },
-    ]);
+    setSolicitudAEliminar(solicitud);
   };
 
   return (
@@ -41,13 +40,26 @@ export default function SolicitudesScreen() {
       <Pestanas opciones={filtros} activa={filtro} onCambiar={setFiltro} desplazable />
 
       <ScrollView className="px-4 pt-4" contentContainerClassName="pb-28">
+        {cargando && (
+          <Text className="py-5 text-center text-sky-800">
+            Cargando tus solicitudes...
+          </Text>
+        )}
+        {error !== "" && (
+          <View className="mb-4 rounded-xl bg-red-50 p-4">
+            <Text className="text-center text-red-700">{error}</Text>
+            <Pressable onPress={() => void cargar()} className="mt-2">
+              <Text className="text-center font-bold text-sky-800">Reintentar</Text>
+            </Pressable>
+          </View>
+        )}
         <Buscador
           valor={busqueda}
           onCambiar={setBusqueda}
           placeholder="Buscar por nombre o descripción..."
         />
 
-        {visibles.map((s) => (
+        {!cargando && error === "" && visibles.map((s) => (
           <View
             key={s.id}
             className="bg-white rounded-xl shadow mb-4 overflow-hidden border border-sky-200"
@@ -82,7 +94,7 @@ export default function SolicitudesScreen() {
           </View>
         ))}
 
-        {visibles.length === 0 && (
+        {!cargando && error === "" && visibles.length === 0 && (
           <Text className="text-center text-gray-500 mt-8">
             {solicitudes.length === 0
               ? "Aún no tienes solicitudes. Pulsa + para crear una"
@@ -98,6 +110,22 @@ export default function SolicitudesScreen() {
       >
         <Ionicons name="add" size={34} color="white" />
       </Pressable>
+
+      <ModalExito
+        visible={solicitudAEliminar !== null}
+        titulo="Eliminar solicitud"
+        mensaje="¿Seguro que quieres eliminar esta solicitud de tu cuenta?"
+        tipo="confirmacion"
+        textoAccion="Eliminar"
+        textoSecundario="Conservar"
+        onCerrar={() => setSolicitudAEliminar(null)}
+        onAccion={() => {
+          if (solicitudAEliminar) {
+            void eliminarPorId(solicitudAEliminar.id).catch(() => undefined);
+          }
+          setSolicitudAEliminar(null);
+        }}
+      />
     </View>
   );
 }

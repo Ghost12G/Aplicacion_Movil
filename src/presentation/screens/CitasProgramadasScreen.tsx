@@ -1,19 +1,23 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
-import { Alert, Modal, Pressable, ScrollView, Text, View } from "react-native";
+import { Modal, Pressable, ScrollView, Text, View } from "react-native";
+import { useRouter } from "expo-router";
 import { Cita } from "../../domain/entities/Cita";
 import { Modalidad } from "../../domain/entities/Especialidad";
 import Buscador from "../components/Buscador";
 import Cabecera from "../components/Cabecera";
+import ModalExito from "../components/ModalExito";
 import { useCitas } from "../hooks/useCitas";
 
 const pestanas: Modalidad[] = ["Virtual", "Presencial"];
 
 export default function CitasProgramadasScreen() {
+  const router = useRouter();
   const [pestana, setPestana] = useState<Modalidad>("Presencial");
-  const { citas, cancelar: cancelarPorId } = useCitas();
+  const { citas, cargando, error, cargar, cancelar: cancelarPorId } = useCitas();
   const [busqueda, setBusqueda] = useState("");
   const [detalle, setDetalle] = useState<Cita | null>(null);
+  const [citaACancelar, setCitaACancelar] = useState<Cita | null>(null);
 
   // Buscador: filtra por especialidad o médico mientras se escribe
   const visibles = citas.filter(
@@ -23,16 +27,7 @@ export default function CitasProgramadasScreen() {
   );
 
   const cancelar = (cita: Cita) => {
-    Alert.alert("Cancelar cita", "¿Seguro que quieres cancelar esta cita?", [
-      { text: "No" },
-      {
-        text: "Sí, cancelar",
-        style: "destructive",
-        onPress: () => {
-          cancelarPorId(cita.id);
-        },
-      },
-    ]);
+    setCitaACancelar(cita);
   };
 
   const filasDetalle = (c: Cita): [string, string][] => [
@@ -75,7 +70,20 @@ export default function CitasProgramadasScreen() {
           placeholder="Buscar por especialidad o médico..."
         />
 
-        {visibles.map((c) => (
+        {cargando && (
+          <Text className="text-center text-sky-800 mt-8">Cargando citas...</Text>
+        )}
+
+        {error !== "" && (
+          <View className="items-center mt-4">
+            <Text className="text-center text-red-600">{error}</Text>
+            <Pressable onPress={() => void cargar()}>
+              <Text className="text-sky-800 font-bold mt-2">Reintentar</Text>
+            </Pressable>
+          </View>
+        )}
+
+        {!cargando && visibles.map((c) => (
           <View
             key={c.id}
             className="bg-white rounded-xl shadow mb-4 overflow-hidden border border-sky-200"
@@ -120,7 +128,7 @@ export default function CitasProgramadasScreen() {
           </View>
         ))}
 
-        {visibles.length === 0 && (
+        {!cargando && error === "" && visibles.length === 0 && (
           <Text className="text-center text-gray-500 mt-8">
             No tienes citas {pestana.toLowerCase()}es
           </Text>
@@ -157,8 +165,19 @@ export default function CitasProgramadasScreen() {
               ))}
 
               <Pressable
+                onPress={() => {
+                  const citaId = detalle.id;
+                  setDetalle(null);
+                  router.push({ pathname: "/reservar", params: { citaId } });
+                }}
+                className="bg-sky-600 rounded-full py-3 px-10 self-center mt-4"
+              >
+                <Text className="text-white text-lg font-bold">Reprogramar</Text>
+              </Pressable>
+
+              <Pressable
                 onPress={() => setDetalle(null)}
-                className="bg-sky-900 rounded-full py-3 px-10 self-center mt-4"
+                className="bg-sky-900 rounded-full py-3 px-10 self-center mt-3"
               >
                 <Text className="text-white text-lg font-bold">Cerrar</Text>
               </Pressable>
@@ -166,6 +185,20 @@ export default function CitasProgramadasScreen() {
           )}
         </View>
       </Modal>
+
+      <ModalExito
+        visible={citaACancelar !== null}
+        titulo="Cancelar cita"
+        mensaje="¿Seguro que quieres cancelar esta cita? La cancelación se sincronizará con tus otros teléfonos."
+        tipo="confirmacion"
+        textoAccion="Sí, cancelar"
+        textoSecundario="Volver"
+        onCerrar={() => setCitaACancelar(null)}
+        onAccion={() => {
+          if (citaACancelar) void cancelarPorId(citaACancelar.id);
+          setCitaACancelar(null);
+        }}
+      />
     </View>
   );
 }

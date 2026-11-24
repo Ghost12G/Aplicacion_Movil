@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { View, Text, Pressable } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import Cabecera from "../components/Cabecera";
@@ -8,24 +8,71 @@ import Boton from "../components/Boton";
 import ModalExito from "../components/ModalExito";
 import { useFormulario } from "../hooks/useFormulario";
 import { solicitudService } from "../../infrastructure/container";
-import { TipoSolicitud } from "../../domain/entities/Solicitud";
+import { Solicitud, TipoSolicitud } from "../../domain/entities/Solicitud";
+import { mensajeDeError } from "../../shared/errores";
 
 const tipos: TipoSolicitud[] = ["Consulta", "Reclamo", "Sugerencia"];
 
 export default function SolicitudFormScreen() {
   const router = useRouter();
-  const { id } = useLocalSearchParams<{ id?: string }>();
+  const parametros = useLocalSearchParams<{ id?: string }>();
+  const id = Array.isArray(parametros.id) ? parametros.id[0] : parametros.id;
 
-  // Si llega un id, estamos EDITANDO una solicitud que ya existe
-  const existente = id ? solicitudService.obtener(id) : undefined;
-
+  const [existente, setExistente] = useState<Solicitud | null>(null);
+  const contacto = solicitudService.obtenerDatosContacto();
+  const contactoPrecargado =
+    !id && Boolean(contacto.nombre.trim() && contacto.telefono.trim());
+  const [cargandoSolicitud, setCargandoSolicitud] = useState(Boolean(id));
+  const [guardando, setGuardando] = useState(false);
+  const [mensajeModal, setMensajeModal] = useState("");
+  const [tipoModal, setTipoModal] = useState<"exito" | "error">("exito");
   const [guardado, setGuardado] = useState(false);
-  const { valores, errores, setErrores, cambiar } = useFormulario({
-    nombre: existente ? existente.nombre : "",
-    telefono: existente ? existente.telefono : "",
-    tipo: existente ? existente.tipo : "",
-    descripcion: existente ? existente.descripcion : "",
+  const {
+    valores,
+    errores,
+    setErrores,
+    cambiar,
+    establecerValores,
+  } = useFormulario({
+    nombre: contacto.nombre,
+    telefono: contacto.telefono,
+    tipo: "",
+    descripcion: "",
   });
+
+  useEffect(() => {
+    if (!id) return;
+
+    let activo = true;
+    void solicitudService
+      .obtener(id)
+      .then((solicitud) => {
+        if (!activo) return;
+        if (!solicitud) {
+          throw new Error("No se encontró la solicitud que quieres editar.");
+        }
+        setExistente(solicitud);
+        establecerValores({
+          nombre: solicitud.nombre,
+          telefono: solicitud.telefono,
+          tipo: solicitud.tipo,
+          descripcion: solicitud.descripcion,
+        });
+      })
+      .catch((error: unknown) => {
+        if (!activo) return;
+        setTipoModal("error");
+        setMensajeModal(mensajeDeError(error));
+        setGuardado(true);
+      })
+      .finally(() => {
+        if (activo) setCargandoSolicitud(false);
+      });
+
+    return () => {
+      activo = false;
+    };
+  }, [id, establecerValores]);
 
   const validar = (): boolean => {
     const nuevosErrores: Record<string, string> = {};
@@ -51,9 +98,11 @@ export default function SolicitudFormScreen() {
     return Object.keys(nuevosErrores).length === 0;
   };
 
-  const guardar = () => {
+  const guardar = async () => {
     if (!validar()) return;
 
+    setGuardado(false);
+    setGuardando(true);
     const datos = {
       nombre: valores.nombre.trim(),
       telefono: valores.telefono,
@@ -61,30 +110,55 @@ export default function SolicitudFormScreen() {
       descripcion: valores.descripcion.trim(),
     };
 
-    if (existente) {
-      solicitudService.actualizar(existente.id, datos); // actualizar
-    } else {
-      solicitudService.crear(datos); // crear
+    try {
+      if (existente) {
+        await solicitudService.actualizar(existente.id, datos);
+      } else {
+        await solicitudService.crear(datos);
+      }
+      setTipoModal("exito");
+      setMensajeModal(
+        existente
+          ? "Los cambios se guardaron correctamente."
+          : "Tu solicitud se guardó en tu cuenta y podrás consultarla desde tus otros dispositivos."
+      );
+      setGuardado(true);
+    } catch (error) {
+      setTipoModal("error");
+      setMensajeModal(mensajeDeError(error));
+      setGuardado(true);
+    } finally {
+      setGuardando(false);
     }
-    setGuardado(true);
   };
 
   const cerrarModal = () => {
     setGuardado(false);
-    router.back();
+    if (tipoModal === "exito") router.back();
   };
 
   return (
     <View className="flex-1 bg-white">
-      <Cabecera titulo={existente ? "Editar solicitud" : "Nueva solicitud"} />
+      <Cabecera titulo={id ? "Editar solicitud" : "Nueva solicitud"} />
 
       <ScrollFormulario className="px-4 pt-6" contentContainerClassName="pb-10">
+        {cargandoSolicitud && (
+          <Text className="mb-4 text-center text-sky-800">
+            Cargando solicitud...
+          </Text>
+        )}
+        {contactoPrecargado && (
+          <Text className="text-sm text-gray-600 mb-3">
+            El nombre y teléfono se cargaron desde tu perfil.
+          </Text>
+        )}
         <InputField
           icono="person"
           placeholder="Nombre del cliente"
           value={valores.nombre}
           onChangeText={(texto) => cambiar("nombre", texto)}
           error={errores.nombre}
+          editable={Boolean(existente) || !contactoPrecargado}
         />
         <InputField
           icono="call"
@@ -93,6 +167,7 @@ export default function SolicitudFormScreen() {
           onChangeText={(texto) => cambiar("telefono", texto)}
           teclado="numeric"
           error={errores.telefono}
+          editable={Boolean(existente) || !contactoPrecargado}
         />
 
         <Text className="text-base mb-2">Tipo de solicitud</Text>
@@ -129,8 +204,15 @@ export default function SolicitudFormScreen() {
         />
 
         <Boton
-          titulo={existente ? "Guardar cambios" : "Enviar solicitud"}
+          titulo={
+            guardando
+              ? "Guardando..."
+              : id
+                ? "Guardar cambios"
+                : "Enviar solicitud"
+          }
           onPress={guardar}
+          deshabilitado={guardando || cargandoSolicitud || Boolean(id && !existente)}
         />
         <View className="h-3" />
         <Boton titulo="Cancelar" variante="gris" onPress={() => router.back()} />
@@ -139,12 +221,9 @@ export default function SolicitudFormScreen() {
       <ModalExito
         visible={guardado}
         titulo="Solicitud"
-        mensaje={
-          existente
-            ? "Los cambios se guardaron correctamente"
-            : "Tu solicitud se registró correctamente. Puedes verla en Mis solicitudes"
-        }
+        mensaje={mensajeModal}
         onCerrar={cerrarModal}
+        tipo={tipoModal}
       />
     </View>
   );

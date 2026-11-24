@@ -9,6 +9,7 @@ import Boton from "../components/Boton";
 import ModalExito from "../components/ModalExito";
 import { useFormulario } from "../hooks/useFormulario";
 import { authService, perfilService } from "../../infrastructure/container";
+import { mensajeDeError } from "../../shared/errores";
 
 const operadores = ["Claro", "Movistar", "Entel", "Bitel"];
 
@@ -18,10 +19,9 @@ export default function PerfilScreen() {
 
   const [operador, setOperador] = useState(usuario ? usuario.operador : "Claro");
   const [guardado, setGuardado] = useState(false);
+  const [errorGuardar, setErrorGuardar] = useState("");
   const { valores, errores, setErrores, cambiar } = useFormulario({
     celular: usuario ? usuario.celular : "",
-    telefonoFijo: usuario ? usuario.telefonoFijo : "",
-    correo: usuario ? usuario.correo : "",
   });
 
   const validar = (): boolean => {
@@ -33,33 +33,23 @@ export default function PerfilScreen() {
       nuevosErrores.celular = "El celular debe tener 9 dígitos";
     }
 
-    // El teléfono fijo es opcional, pero si lo escribes debe ser válido
-    if (valores.telefonoFijo.trim() !== "") {
-      if (valores.telefonoFijo.length < 6 || valores.telefonoFijo.length > 9) {
-        nuevosErrores.telefonoFijo = "Debe tener entre 6 y 9 dígitos";
-      }
-    }
-
-    if (valores.correo.trim() === "") {
-      nuevosErrores.correo = "El correo es obligatorio";
-    } else if (!/\S+@\S+\.\S+/.test(valores.correo)) {
-      nuevosErrores.correo = "Escribe un correo válido";
-    }
-
     setErrores(nuevosErrores);
     return Object.keys(nuevosErrores).length === 0;
   };
 
-  const guardar = () => {
+  const guardar = async () => {
     if (!usuario || !validar()) return;
 
-    perfilService.actualizarContacto({
-      operador,
-      celular: valores.celular,
-      telefonoFijo: valores.telefonoFijo,
-      correo: valores.correo.trim(),
-    });
-    setGuardado(true);
+    setErrorGuardar("");
+    try {
+      await perfilService.actualizarContacto({
+        operador,
+        celular: valores.celular,
+      });
+      setGuardado(true);
+    } catch (error) {
+      setErrorGuardar(mensajeDeError(error));
+    }
   };
 
   const cerrarModal = () => {
@@ -107,22 +97,10 @@ export default function PerfilScreen() {
           teclado="numeric"
           error={errores.celular}
         />
-        <InputField
-          icono="call"
-          placeholder="Teléfono Fijo"
-          value={valores.telefonoFijo}
-          onChangeText={(texto) => cambiar("telefonoFijo", texto)}
-          teclado="numeric"
-          error={errores.telefonoFijo}
-        />
-        <InputField
-          icono="mail"
-          placeholder="Correo"
-          value={valores.correo}
-          onChangeText={(texto) => cambiar("correo", texto)}
-          teclado="email-address"
-          error={errores.correo}
-        />
+        <View className="flex-row items-center bg-gray-100 px-3 py-3 mb-4">
+          <Ionicons name="mail" size={22} color="#9ca3af" />
+          <Text className="ml-3 text-base text-gray-500">{usuario ? usuario.correo : ""}</Text>
+        </View>
 
         <View className="flex-row mt-2">
           <View className="flex-1 mr-2">
@@ -139,6 +117,13 @@ export default function PerfilScreen() {
         titulo="Mi Perfil"
         mensaje="Tus datos de contacto se guardaron correctamente"
         onCerrar={cerrarModal}
+      />
+      <ModalExito
+        visible={errorGuardar !== ""}
+        titulo="No se pudo guardar"
+        mensaje={errorGuardar}
+        tipo="error"
+        onCerrar={() => setErrorGuardar("")}
       />
     </View>
   );

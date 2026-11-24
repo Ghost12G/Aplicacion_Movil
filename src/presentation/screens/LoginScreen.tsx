@@ -1,32 +1,35 @@
 import { useState } from "react";
-import { View, Text, Image, Pressable, Alert } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { View, Text, Image, Pressable } from "react-native";
 import { useRouter } from "expo-router";
 import InputField from "../components/InputField";
 import ScrollFormulario from "../components/ScrollFormulario";
 import Boton from "../components/Boton";
 import AvisoInfo from "../components/AvisoInfo";
+import ModalExito from "../components/ModalExito";
 import { useFormulario } from "../hooks/useFormulario";
-import { authService } from "../../infrastructure/container";
-import { Usuario } from "../../domain/entities/Usuario";
+import { authService, citaFirestoreSyncService } from "../../infrastructure/container";
+import { mensajeDeError } from "../../shared/errores";
+
+const formatoCorreo = /\S+@\S+\.\S+/;
 
 export default function LoginScreen() {
   const router = useRouter();
-  const [recordar, setRecordar] = useState(false);
-  // Si hay una cuenta recordada, se muestra su tarjeta en vez del formulario
-  const [cuenta, setCuenta] = useState<Usuario | null>(() =>
-    authService.obtenerCuentaRecordada()
-  );
+  const [cargando, setCargando] = useState(false);
+  const [mostrarMensaje, setMostrarMensaje] = useState(false);
+  const [mensaje, setMensaje] = useState("");
+  const [tipoMensaje, setTipoMensaje] = useState<"exito" | "error">("exito");
   const { valores, errores, setErrores, cambiar } = useFormulario({
-    dni: "",
+    correo: "",
     password: "",
   });
 
-  const ingresar = () => {
+  const ingresar = async () => {
     const nuevosErrores: Record<string, string> = {};
 
-    if (valores.dni.trim() === "") {
-      nuevosErrores.dni = "El número de documento no puede estar vacío";
+    if (valores.correo.trim() === "") {
+      nuevosErrores.correo = "El correo no puede estar vacío";
+    } else if (!formatoCorreo.test(valores.correo)) {
+      nuevosErrores.correo = "Escribe un correo válido";
     }
     if (valores.password.trim() === "") {
       nuevosErrores.password = "La contraseña no puede estar vacía";
@@ -36,24 +39,37 @@ export default function LoginScreen() {
       return;
     }
 
-    const usuario = authService.iniciarSesion(valores.dni, valores.password, recordar);
-
-    if (usuario) {
+    setCargando(true);
+    try {
+      await authService.iniciarSesion(valores.correo, valores.password);
+      void citaFirestoreSyncService.sincronizarPendientes().catch((error: unknown) => {
+        console.error("Las citas siguen pendientes de sincronización.", error);
+      });
       setErrores({});
       router.replace("/home");
-    } else {
-      setErrores({ password: "Documento o contraseña incorrectos" });
+    } catch (error) {
+      setErrores({ password: mensajeDeError(error) });
+    } finally {
+      setCargando(false);
     }
   };
 
-  const ingresarConCuenta = () => {
-    authService.iniciarSesionRecordada();
-    router.replace("/home");
-  };
+  const recuperarPassword = async () => {
+    if (!formatoCorreo.test(valores.correo)) {
+      setErrores({ correo: "Escribe tu correo para recuperar la contraseña" });
+      return;
+    }
 
-  const quitarCuenta = () => {
-    authService.olvidarCuenta();
-    setCuenta(null);
+    try {
+      await authService.recuperarPassword(valores.correo);
+      setTipoMensaje("exito");
+      setMensaje("Te enviamos un enlace para restablecer tu contraseña.");
+      setMostrarMensaje(true);
+    } catch (error) {
+      setTipoMensaje("error");
+      setMensaje(mensajeDeError(error));
+      setMostrarMensaje(true);
+    }
   };
 
   return (
@@ -70,61 +86,30 @@ export default function LoginScreen() {
       <View className="bg-white rounded-2xl p-5 shadow mb-5">
         <Text className="text-3xl font-bold text-center mb-6">Bienvenido(a)</Text>
 
-        {cuenta ? (
-          <View>
-            <View className="flex-row items-center bg-cyan-50 rounded-xl p-4 mb-5 shadow">
-              <Ionicons name="person" size={40} color="#0369a1" />
-              <View className="flex-1 ml-4">
-                <Text className="font-bold text-base">{cuenta.nombre.toUpperCase()}</Text>
-                <Text className="text-gray-600">DNI - {cuenta.dni}</Text>
-              </View>
-              <Pressable onPress={quitarCuenta}>
-                <Ionicons name="close-circle" size={32} color="#ef4444" />
-              </Pressable>
-            </View>
+        <InputField
+          icono="mail"
+          placeholder="Correo electrónico"
+          value={valores.correo}
+          onChangeText={(texto) => cambiar("correo", texto)}
+          teclado="email-address"
+          error={errores.correo}
+        />
+        <InputField
+          icono="lock-closed"
+          placeholder="Contraseña"
+          value={valores.password}
+          onChangeText={(texto) => cambiar("password", texto)}
+          esPassword
+          error={errores.password}
+        />
 
-            <Boton titulo="Ingresar" onPress={ingresarConCuenta} />
-          </View>
-        ) : (
-          <View>
-            <InputField
-              icono="person"
-              placeholder="Número de Documento"
-              value={valores.dni}
-              onChangeText={(texto) => cambiar("dni", texto)}
-              teclado="numeric"
-              error={errores.dni}
-            />
-            <InputField
-              icono="lock-closed"
-              placeholder="Contraseña"
-              value={valores.password}
-              onChangeText={(texto) => cambiar("password", texto)}
-              esPassword
-              error={errores.password}
-            />
+        <Boton
+          titulo={cargando ? "Ingresando..." : "Ingresar"}
+          onPress={ingresar}
+          deshabilitado={cargando}
+        />
 
-            <Pressable
-              onPress={() => setRecordar(!recordar)}
-              className="flex-row items-center mb-4"
-            >
-              <Ionicons
-                name={recordar ? "checkbox" : "square-outline"}
-                size={28}
-                color="#0369a1"
-              />
-              <Text className="ml-2">Recordar Cuenta</Text>
-            </Pressable>
-
-            <Boton titulo="Ingresar" onPress={ingresar} />
-          </View>
-        )}
-
-        <Pressable
-          onPress={() =>
-            Alert.alert("Recuperar contraseña", "Esta función estará disponible pronto")
-          }
-        >
+        <Pressable onPress={recuperarPassword}>
           <Text className="text-center font-bold text-sky-800 my-4">
             ¿Olvidaste tu contraseña?
           </Text>
@@ -140,6 +125,13 @@ export default function LoginScreen() {
 
       <AvisoInfo texto="Consultas al 000 0000, de lunes a sábado." />
       <AvisoInfo texto="Visítanos en la sede más cercana de tu clínica." />
+      <ModalExito
+        visible={mostrarMensaje}
+        titulo={tipoMensaje === "exito" ? "Revisa tu correo" : "No se pudo enviar"}
+        mensaje={mensaje}
+        tipo={tipoMensaje}
+        onCerrar={() => setMostrarMensaje(false)}
+      />
     </ScrollFormulario>
   );
 }

@@ -13,4 +13,5 @@ export interface Solicitud extends DatosSolicitud {
   id: string;
   fecha: string;
   usuarioDni: string; // dueño de la solicitud
+  usuarioUid: string;
 }

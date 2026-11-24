@@ -12,11 +12,11 @@ export default function HomeScreen() {
   const [menuVisible, setMenuVisible] = useState(false);
 
   const usuario = authService.obtenerUsuarioActual();
-  const nombre = usuario ? usuario.nombre.toUpperCase() : "";
+  const nombre = usuario?.nombre?.toUpperCase() ?? "";
 
-  const cerrarSesion = () => {
+  const cerrarSesion = async () => {
     setMenuVisible(false);
-    authService.cerrarSesion();
+    await authService.cerrarSesion();
     router.replace("/login");
   };
 
@@ -110,7 +110,7 @@ export default function HomeScreen() {
         onDiabetes={() => ir("/diabetes")}
         onCerrarSesion={cerrarSesion}
         centro={CENTRO}
-        vigencia="07/11/2026"
+        vigencia="24/12/2026"
       />
     </View>
   );
