@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
-import { View, Text, ScrollView, Pressable } from "react-native";
+import { View, ScrollView, Pressable } from "react-native";
+import Text from "../components/ThemedText";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import Cabecera from "../components/Cabecera";
@@ -354,9 +355,9 @@ export default function ReservarCitaScreen() {
         }
 
         const descripcionAccion = citaId
-          ? "La cita se reprogramó en este dispositivo."
-          : "La cita se confirmó y se guardó en tu cuenta.";
-        setMensajeExito(`${descripcionAccion} Preparando recordatorio y sincronización...`);
+          ? "La cita se reprogramó correctamente."
+          : "La cita se confirmó y quedó guardada en tu cuenta.";
+        setMensajeExito(`${descripcionAccion} Estamos preparando el recordatorio...`);
         setExito(true);
         void (async () => {
           const mensajes = [descripcionAccion];
@@ -393,13 +394,13 @@ export default function ReservarCitaScreen() {
             const sincronizacion =
               await citaFirestoreSyncService.sincronizarPendientes();
             mensajes.push(
-              sincronizacion.pendientes > 0
-                ? "La sincronización con Firestore quedó pendiente y se reintentará al recuperar la conexión."
-                : "La cita se sincronizó correctamente con Firestore."
+              sincronizacion.estado === "completa"
+                ? "Tus citas ya están actualizadas en tus dispositivos."
+                : "El cambio quedó guardado en este teléfono y se actualizará en tus otros dispositivos cuando vuelva la conexión."
             );
           } catch (error) {
             mensajes.push(
-              `La cita sigue guardada en el dispositivo, pero la sincronización quedó pendiente: ${mensajeDeError(error)}`
+              `El cambio quedó guardado en este teléfono, pero no se pudo actualizar en tus otros dispositivos. Revisa tu conexión e inténtalo más tarde. Detalle: ${mensajeDeError(error)}`
             );
           }
           setMensajeExito(mensajes.join(" "));
@@ -428,7 +429,7 @@ export default function ReservarCitaScreen() {
   };
 
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1 bg-white dark:bg-slate-950">
       <Cabecera
         titulo={
           vista === "fecha"
@@ -505,13 +506,13 @@ export default function ReservarCitaScreen() {
               const noDisponible = horasNoDisponibles.includes(h);
               const elegida = tempHora === h;
 
-              let fondo = "bg-white border-sky-700";
+              let fondo = "bg-white dark:bg-slate-900 border-sky-700 dark:border-sky-400";
               let colorTexto = "text-sky-700";
               if (noDisponible) {
-                fondo = "bg-gray-200 border-gray-300";
+                fondo = "bg-gray-200 dark:bg-slate-700 border-gray-300 dark:border-slate-600";
                 colorTexto = "text-gray-400";
               } else if (elegida) {
-                fondo = "bg-sky-700 border-sky-700";
+                fondo = "bg-sky-700 border-sky-700 dark:border-sky-400";
                 colorTexto = "text-white";
               }
 
@@ -605,7 +606,7 @@ export default function ReservarCitaScreen() {
                 </View>
               )}
               {sinConexionCitas && errorCitasPaciente === "" && (
-                <View className="mt-3 rounded-xl bg-amber-50 p-3">
+                <View className="mt-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 p-3">
                   <Text className="text-center text-amber-900">
                     Sin internet. Puedes consultar las citas guardadas en este teléfono,
                     pero debes reconectarte para confirmar una reserva nueva.
@@ -613,7 +614,7 @@ export default function ReservarCitaScreen() {
                 </View>
               )}
               {sincronizacionPendienteCitas && errorCitasPaciente === "" && (
-                <View className="mt-3 rounded-xl bg-amber-50 p-3">
+                <View className="mt-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 p-3">
                   <Text className="text-center text-amber-900">
                     Hay cambios de citas que todavía no se confirmaron en Firestore.
                     Sincroniza o resuelve la cita pendiente antes de reservar otra.
@@ -716,7 +717,7 @@ export default function ReservarCitaScreen() {
                   key={m.id}
                   disabled={cargandoSugerencias || errorSugerencias !== ""}
                   onPress={() => elegirMedico(m)}
-                  className="flex-row bg-white rounded-xl shadow mb-4 overflow-hidden border border-gray-100"
+                  className="flex-row bg-white dark:bg-slate-900 rounded-xl shadow mb-4 overflow-hidden border border-gray-100 dark:border-slate-700"
                 >
                   <View className="w-2 bg-sky-600" />
                   <View className="flex-1 p-3">
@@ -765,7 +766,7 @@ export default function ReservarCitaScreen() {
                 </Text>
               </TarjetaInfo>
 
-              <View className="flex-row items-center bg-cyan-50 rounded-xl p-4 mb-3">
+              <View className="flex-row items-center bg-cyan-50 dark:bg-slate-800 rounded-xl p-4 mb-3">
                 <Ionicons name="time-outline" size={34} color="#0369a1" />
                 <View className="flex-1 ml-4">
                   <Text className="text-base font-bold">

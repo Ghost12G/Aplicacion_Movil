@@ -40,7 +40,7 @@ export default function SplashScreen() {
   }, [router]);
 
   return (
-    <View className="flex-1 items-center justify-center bg-sky-50">
+    <View className="flex-1 items-center justify-center bg-sky-50 dark:bg-slate-950">
       <Image
         source={require("../../../assets/images/logo-clinic-digital.png")}
         className="w-64 h-72"

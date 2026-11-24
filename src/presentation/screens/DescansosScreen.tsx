@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { ScrollView, Text, View } from "react-native";
+import { ScrollView, View } from "react-native";
+import Text from "../components/ThemedText";
 import { historialService } from "../../infrastructure/container";
 import { formatearFecha } from "../../shared/fechas";
 import Buscador from "../components/Buscador";
@@ -24,7 +25,7 @@ export default function DescansosScreen() {
   };
 
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1 bg-white dark:bg-slate-950">
       <Cabecera titulo="Descansos Médicos" />
 
       <ScrollView className="px-4 pt-4" contentContainerClassName="pb-10">

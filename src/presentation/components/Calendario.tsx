@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, View } from "react-native";
+import Text from "./ThemedText";
 import { esDiaAgotado, formatearFecha } from "../../shared/fechas";
 
 interface Props {
@@ -79,7 +80,7 @@ export default function Calendario({ fechaElegida, onElegir }: Props) {
             estilo = "";
             colorTexto = "text-gray-300";
           } else if (agotado) {
-            estilo = "bg-gray-200";
+            estilo = "bg-gray-200 dark:bg-slate-700";
             colorTexto = "text-gray-600";
           } else if (elegido) {
             estilo = "bg-sky-700";

@@ -1,4 +1,5 @@
-import { ScrollView, View, Text, Image } from "react-native";
+import { ScrollView, View, Image } from "react-native";
+import Text from "../components/ThemedText";
 import { Ionicons } from "@expo/vector-icons";
 import Cabecera from "../components/Cabecera";
 
@@ -49,7 +50,7 @@ const avisos = [
 
 export default function AcercaScreen() {
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1 bg-white dark:bg-slate-950">
       <Cabecera titulo="Acerca de" />
 
       <ScrollView className="px-4 pt-5" contentContainerClassName="pb-10">
@@ -70,7 +71,7 @@ export default function AcercaScreen() {
 
         <Text className="text-2xl font-bold text-sky-800 mb-3">¿Qué puedes hacer?</Text>
         {funciones.map((f) => (
-          <View key={f.texto} className="flex-row items-center bg-cyan-50 rounded-xl p-3 mb-2">
+          <View key={f.texto} className="flex-row items-center bg-cyan-50 dark:bg-slate-800 rounded-xl p-3 mb-2">
             <Ionicons name={f.icono} size={26} color="#0369a1" />
             <Text className="flex-1 ml-3 text-base">{f.texto}</Text>
           </View>
@@ -82,7 +83,7 @@ export default function AcercaScreen() {
         {avisos.map((aviso) => (
           <View
             key={aviso.titulo}
-            className="mb-3 rounded-2xl border border-sky-100 bg-sky-50 p-4"
+            className="mb-3 rounded-2xl border border-sky-100 dark:border-slate-700 bg-sky-50 dark:bg-sky-950/40 p-4"
           >
             <View className="mb-1 flex-row items-center">
               <Ionicons name={aviso.icono} size={22} color="#0369a1" />

@@ -1,4 +1,5 @@
-import { View, Text, Pressable } from "react-native";
+import { View, Pressable } from "react-native";
+import Text from "./ThemedText";
 import { Ionicons } from "@expo/vector-icons";
 
 interface Props {
@@ -31,8 +32,8 @@ export default function RadioGrupo({
               horizontal ? "mr-3 mb-2" : "mb-2"
             } ${
               valor === op
-                ? "border-sky-700 bg-sky-50"
-                : "border-slate-200 bg-white"
+                ? "border-sky-700 dark:border-sky-400 bg-sky-50 dark:bg-sky-950/40"
+                : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900"
             }`}
           >
             <Ionicons

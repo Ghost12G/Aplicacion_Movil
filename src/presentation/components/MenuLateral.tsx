@@ -1,4 +1,5 @@
-import { Modal, View, Text, Pressable, Image } from "react-native";
+import { Modal, View, Pressable, Image, useColorScheme } from "react-native";
+import Text from "./ThemedText";
 import { Ionicons } from "@expo/vector-icons";
 
 interface Props {
@@ -18,9 +19,11 @@ interface ItemProps {
 }
 
 function ItemMenu({ icono, titulo, onPress }: ItemProps) {
+  const colorScheme = useColorScheme();
+
   return (
     <Pressable onPress={onPress} className="flex-row items-center px-5 py-4">
-      <Ionicons name={icono} size={26} color="#0369a1" />
+      <Ionicons name={icono} size={26} color={colorScheme === "dark" ? "#7dd3fc" : "#0369a1"} />
       <Text className="ml-4 text-lg flex-1">{titulo}</Text>
     </Pressable>
   );
@@ -44,8 +47,8 @@ export default function MenuLateral({
     >
       <View className="flex-1 flex-row">
         {/* Panel blanco del menú */}
-        <View className="w-3/4 bg-white">
-          <View className="bg-sky-100 pt-14 px-5 pb-5">
+        <View className="w-3/4 bg-white dark:bg-slate-900">
+          <View className="bg-sky-100 dark:bg-slate-800 pt-14 px-5 pb-5">
             <Image
               source={require("../../../assets/images/logo-clinic-digital-horizontal.png")}
               className="w-full h-20 mb-4"
@@ -61,7 +64,7 @@ export default function MenuLateral({
           <ItemMenu icono="person" titulo="Mi Perfil" onPress={onPerfil} />
           <ItemMenu icono="water" titulo="Riesgo Diabetes Tipo 2" onPress={onDiabetes} />
 
-          <View className="border-t border-gray-300 mt-2" />
+          <View className="border-t border-gray-300 dark:border-slate-600 mt-2" />
           <ItemMenu
             icono="log-out"
             titulo="Cerrar Sesión"

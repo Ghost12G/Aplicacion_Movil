@@ -1,7 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, View } from "react-native";
+import Text from "../components/ThemedText";
 import { Solicitud } from "../../domain/entities/Solicitud";
 import Buscador from "../components/Buscador";
 import Cabecera from "../components/Cabecera";
@@ -35,7 +36,7 @@ export default function SolicitudesScreen() {
   };
 
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1 bg-white dark:bg-slate-950">
       <Cabecera titulo="Mis solicitudes" />
       <Pestanas opciones={filtros} activa={filtro} onCambiar={setFiltro} desplazable />
 
@@ -46,7 +47,7 @@ export default function SolicitudesScreen() {
           </Text>
         )}
         {error !== "" && (
-          <View className="mb-4 rounded-xl bg-red-50 p-4">
+          <View className="mb-4 rounded-xl bg-red-50 dark:bg-red-950/40 p-4">
             <Text className="text-center text-red-700">{error}</Text>
             <Pressable onPress={() => void cargar()} className="mt-2">
               <Text className="text-center font-bold text-sky-800">Reintentar</Text>
@@ -62,7 +63,7 @@ export default function SolicitudesScreen() {
         {!cargando && error === "" && visibles.map((s) => (
           <View
             key={s.id}
-            className="bg-white rounded-xl shadow mb-4 overflow-hidden border border-sky-200"
+            className="bg-white dark:bg-slate-900 rounded-xl shadow mb-4 overflow-hidden border border-sky-200 dark:border-slate-700"
           >
             <View className="flex-row items-center justify-between bg-sky-700 px-3 py-2">
               <Text className="text-white font-bold">{s.tipo.toUpperCase()}</Text>

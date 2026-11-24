@@ -2,7 +2,7 @@
 
 Aplicación móvil académica para practicar el desarrollo con **Expo**, **React Native**, **TypeScript**, **Expo Router**, **NativeWind** y servicios de **Firebase**. Incluye registro e inicio de sesión, gestión de citas, solicitudes, perfil de usuario y un test referencial de riesgo de diabetes tipo 2.
 
-> Este proyecto es una práctica académica. Antes de distribuirlo ampliamente, se deben completar las pruebas en un APK Android y revisar las alertas de dependencias que todavía reporte `npm audit`.
+> Este proyecto es una práctica académica. Antes de distribuirlo ampliamente, conviene probar el APK release en un teléfono Android y revisar las alertas de dependencias que muestre `npm audit`.
 
 ## Funcionalidades
 
@@ -13,7 +13,8 @@ Aplicación móvil académica para practicar el desarrollo con **Expo**, **React
 - Solicitudes de tipo consulta, reclamo o sugerencia: se crean, consultan, editan y eliminan en la subcolección de Firestore de la cuenta.
 - Consulta de atenciones, recetas y descansos médicos con datos de práctica.
 - Test de riesgo de diabetes tipo 2. El resultado es referencial y no reemplaza una evaluación médica.
-- Recordatorio local de cita, programado para 24 horas antes cuando corresponde y con permiso de notificaciones. Se programa en el dispositivo donde se reservó; todavía falta validarlo en un APK Android.
+- Recordatorio local de cita, programado para 24 horas antes cuando corresponde y con permiso de notificaciones. Se programa en el dispositivo donde se reservó; su recepción debe probarse en un teléfono Android.
+- La interfaz sigue automáticamente el tema claro u oscuro configurado en el dispositivo.
 - Pantallas de inicio, navegación, perfil, acerca de la aplicación y mensajes de confirmación/resultado con componentes reutilizables.
 
 ## Persistencia y sincronización
@@ -54,7 +55,8 @@ Las versiones instaladas están registradas en `package.json` y `package-lock.js
 - Node.js y npm.
 - Un proyecto de Firebase con **Authentication (correo y contraseña)** y **Cloud Firestore** habilitados.
 - Para ejecutar con Expo Go: Expo Go instalado en un teléfono.
-- Para generar e instalar un APK local: Android Studio, Android SDK, Java/JDK y un emulador o teléfono Android. En el teléfono se puede habilitar la depuración USB.
+- Para generar un APK local en Windows: Android Studio, Android SDK, JDK y un emulador o teléfono Android. En el teléfono se puede habilitar la depuración USB.
+- Configuración usada para generar el APK de este proyecto: JDK 21, Android SDK Platform 36, Android Build Tools 36.0.0 y NDK 27.1.12297006. Instálalos desde **Android Studio > SDK Manager**.
 
 ## Clonar el repositorio
 
@@ -120,16 +122,32 @@ npm audit
 
 `npm audit fix` puede aplicar correcciones compatibles. No uses `npm audit fix --force` sin revisar antes los cambios: podría instalar versiones incompatibles con Expo SDK 57. En la última revisión del proyecto quedaron alertas transitivas; deben reevaluarse antes de una distribución pública.
 
-## Generar APK Android local
+## Generar APK Android local en Windows
 
-El identificador Android configurado es `com.clinicdigital.app`. Para generar los archivos nativos de Android mediante Expo y compilar una variante release local:
+El identificador Android configurado es `com.clinicdigital.app`. Configura primero Firebase y crea el archivo `.env`, porque las variables `EXPO_PUBLIC_FIREBASE_*` se incorporan al bundle de la aplicación durante la compilación.
+
+Coloca o clona el proyecto en una ruta corta (por ejemplo `D:\ClinicDigital`) para reducir el riesgo de exceder el límite de longitud de ruta de CMake/Ninja. Desde la raíz del proyecto, genera los archivos nativos de Android:
 
 ```bash
-npx expo prebuild --platform android
-npx expo run:android --variant release
+npx expo prebuild --platform android --clean
 ```
 
-Conecta un dispositivo Android con depuración USB habilitada o inicia un emulador. La carpeta `android/` es generada por Expo y está excluida de Git; evita editarla manualmente. El APK release suele quedar en `android/app/build/outputs/apk/release/`.
+> `--clean` elimina y vuelve a crear la carpeta nativa `android/`. Úsalo si esa carpeta fue generada por Expo y no contiene modificaciones nativas manuales.
+
+Luego compila el APK release:
+
+```cmd
+cd android
+.\gradlew.bat assembleRelease
+```
+
+El APK se genera en:
+
+```text
+android\app\build\outputs\apk\release\app-release.apk
+```
+
+La carpeta `android/` es generada por Expo y está excluida de Git; no la edites manualmente ni es necesario subirla al repositorio. El APK también está excluido de Git. Puedes copiar el archivo APK a un teléfono Android e instalarlo; quizá debas permitir la instalación desde la aplicación que utilizaste para abrirlo. Para instalar mediante USB, habilita la depuración USB y usa `adb install`.
 
 Después de instalarlo, acepta el permiso de notificaciones y prueba con una cita a más de 24 horas de distancia. Al ser un recordatorio local, solo se programa en el dispositivo donde se realizó la reserva.
 

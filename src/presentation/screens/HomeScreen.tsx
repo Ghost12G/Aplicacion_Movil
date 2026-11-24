@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { ScrollView, View, Text, Pressable, Image } from "react-native";
+import { ScrollView, View, Pressable, Image, useColorScheme } from "react-native";
+import Text from "../components/ThemedText";
 import { Ionicons } from "@expo/vector-icons";
 import { Href, useRouter } from "expo-router";
 import MenuItem from "../components/MenuItem";
@@ -8,6 +9,7 @@ import { CENTRO } from "../../domain/constantes";
 import { authService } from "../../infrastructure/container";
 
 export default function HomeScreen() {
+  const colorScheme = useColorScheme();
   const router = useRouter();
   const [menuVisible, setMenuVisible] = useState(false);
 
@@ -27,11 +29,15 @@ export default function HomeScreen() {
   };
 
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1 bg-white dark:bg-slate-950">
       {/* Cabecera */}
-      <View className="flex-row items-center bg-sky-100 pt-12 pb-4 px-4">
+      <View className="flex-row items-center bg-sky-100 dark:bg-slate-800 pt-12 pb-4 px-4">
         <Pressable onPress={() => setMenuVisible(true)}>
-          <Ionicons name="menu" size={34} color="#111827" />
+          <Ionicons
+            name="menu"
+            size={34}
+            color={colorScheme === "dark" ? "#f1f5f9" : "#111827"}
+          />
         </Pressable>
 
         <View className="flex-1 ml-4">
@@ -44,7 +50,7 @@ export default function HomeScreen() {
         <Pressable onPress={() => router.push("/acerca")}>
           <Image
             source={require("../../../assets/images/logo-clinic-digital-horizontal.png")}
-            className="w-28 h-12"
+            className="w-28 h-12 bg-white rounded"
             resizeMode="contain"
           />
         </Pressable>

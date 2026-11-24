@@ -18,6 +18,15 @@ export function useCitas() {
     setCargando(true);
     setError("");
 
+    try {
+      setCitas(await citaService.listar());
+      setCargando(false);
+    } catch (error) {
+      setError(`No se pudieron leer las citas guardadas en este teléfono: ${mensajeDeError(error)}`);
+      setCargando(false);
+      return;
+    }
+
     let avisoSincronizacion = "";
     try {
       const resultado = await citaFirestoreSyncService.sincronizarPendientes();
@@ -38,16 +47,13 @@ export function useCitas() {
 
     try {
       setCitas(await citaService.listar());
-      if (avisoSincronizacion) setError(avisoSincronizacion);
     } catch (error) {
-      setError(
-        avisoSincronizacion
-          ? `${avisoSincronizacion} Además, no se pudieron leer las citas locales: ${mensajeDeError(error)}`
-          : mensajeDeError(error)
-      );
-    } finally {
-      setCargando(false);
+      const errorLectura = `No se pudieron actualizar las citas guardadas en este teléfono: ${mensajeDeError(error)}`;
+      setError([avisoSincronizacion, errorLectura].filter(Boolean).join(" "));
+      return;
     }
+
+    if (avisoSincronizacion) setError(avisoSincronizacion);
   }, []);
 
   useFocusEffect(

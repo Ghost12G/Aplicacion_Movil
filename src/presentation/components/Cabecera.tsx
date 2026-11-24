@@ -1,4 +1,5 @@
-import { View, Text, Pressable, Image } from "react-native";
+import { View, Pressable, Image, useColorScheme } from "react-native";
+import Text from "./ThemedText";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 
@@ -9,11 +10,16 @@ interface Props {
 
 export default function Cabecera({ titulo, onAtras }: Props) {
   const router = useRouter();
+  const colorScheme = useColorScheme();
 
   return (
-    <View className="flex-row items-center bg-sky-100 pt-12 pb-4 px-4">
+    <View className="flex-row items-center bg-sky-100 dark:bg-slate-800 pt-12 pb-4 px-4">
       <Pressable onPress={onAtras ?? (() => router.back())}>
-        <Ionicons name="arrow-back" size={30} color="#111827" />
+        <Ionicons
+          name="arrow-back"
+          size={30}
+          color={colorScheme === "dark" ? "#f1f5f9" : "#111827"}
+        />
       </Pressable>
 
       <Text className="flex-1 mx-4 text-lg" numberOfLines={1}>
@@ -22,7 +28,7 @@ export default function Cabecera({ titulo, onAtras }: Props) {
 
       <Image
         source={require("../../../assets/images/logo-clinic-digital-horizontal.png")}
-        className="w-28 h-10"
+        className="w-28 h-10 bg-white rounded"
         resizeMode="contain"
       />
     </View>

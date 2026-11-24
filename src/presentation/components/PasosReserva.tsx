@@ -1,4 +1,5 @@
-import { View, Text } from "react-native";
+import { View } from "react-native";
+import Text from "./ThemedText";
 import { Ionicons } from "@expo/vector-icons";
 
 interface Props {
@@ -20,14 +21,14 @@ export default function PasosReserva({ paso }: Props) {
         const activo = numero === paso;
         const hecho = numero < paso;
 
-        let fondo = "bg-white border border-dashed border-gray-300";
+        let fondo = "bg-white dark:bg-slate-900 border border-dashed border-gray-300 dark:border-slate-600";
         if (activo) fondo = "bg-sky-900";
         if (hecho) fondo = "bg-sky-500";
 
         return (
           <View key={p.nombre} className="flex-1 items-center">
             <View className="flex-row items-center w-full">
-              <View className={`flex-1 h-px ${i === 0 ? "" : "bg-gray-300"}`} />
+              <View className={`flex-1 h-px ${i === 0 ? "" : "bg-gray-300 dark:bg-slate-600"}`} />
               <View className={`w-12 h-12 rounded-full items-center justify-center ${fondo}`}>
                 <Ionicons
                   name={p.icono}
@@ -36,7 +37,7 @@ export default function PasosReserva({ paso }: Props) {
                 />
               </View>
               <View
-                className={`flex-1 h-px ${i === pasos.length - 1 ? "" : "bg-gray-300"}`}
+                className={`flex-1 h-px ${i === pasos.length - 1 ? "" : "bg-gray-300 dark:bg-slate-600"}`}
               />
             </View>
             <Text

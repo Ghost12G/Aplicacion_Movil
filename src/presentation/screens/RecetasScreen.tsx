@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
-import { Modal, Pressable, ScrollView, Text, View } from "react-native";
+import { Modal, Pressable, ScrollView, View } from "react-native";
+import Text from "../components/ThemedText";
 import { CENTRO } from "../../domain/constantes";
 import { Receta } from "../../domain/entities/Historial";
 import { historialService } from "../../infrastructure/container";
@@ -39,7 +40,7 @@ export default function RecetasScreen() {
   );
 
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1 bg-white dark:bg-slate-950">
       <Cabecera titulo="Recetas" />
       <Pestanas opciones={pestanas} activa={pestana} onCambiar={setPestana} />
 
@@ -80,7 +81,7 @@ export default function RecetasScreen() {
       >
         <View className="flex-1 items-center justify-center bg-black/50 px-5">
           {detalle && (
-            <View className="bg-white rounded-3xl p-5 w-full">
+            <View className="bg-white dark:bg-slate-900 rounded-3xl p-5 w-full">
               <View className="flex-row items-center justify-between pb-3 border-b border-gray-200">
                 <Text className="flex-1 text-center text-xl font-bold text-sky-800">
                   RECETA Nº {detalle.numero}

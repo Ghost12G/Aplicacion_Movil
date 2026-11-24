@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { ReactNode } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, View } from "react-native";
+import Text from "./ThemedText";
 import { MESES } from "../../shared/fechas";
 
 interface Props {
@@ -17,11 +18,11 @@ export default function TarjetaHistorial({ fecha, etiqueta, onPress, children }:
     <Pressable
       onPress={onPress}
       disabled={!onPress}
-      className="flex-row bg-white rounded-xl shadow mb-4 overflow-hidden border border-sky-200"
+      className="flex-row bg-white dark:bg-slate-900 rounded-xl shadow mb-4 overflow-hidden border border-sky-200 dark:border-slate-700"
     >
       <View className="w-2 bg-sky-600" />
 
-      <View className="w-24 items-center justify-center px-1 my-3 border-r border-gray-300">
+      <View className="w-24 items-center justify-center px-1 my-3 border-r border-gray-300 dark:border-slate-600">
         <Text className="text-3xl font-bold">{dia}</Text>
         <Text className="text-xs">{MESES[fecha.getMonth()].toUpperCase()}</Text>
         <Text className="text-xs">{fecha.getFullYear()}</Text>

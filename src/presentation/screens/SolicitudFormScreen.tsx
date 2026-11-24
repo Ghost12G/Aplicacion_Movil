@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { View, Text, Pressable } from "react-native";
+import { View, Pressable } from "react-native";
+import Text from "../components/ThemedText";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import Cabecera from "../components/Cabecera";
 import InputField from "../components/InputField";
@@ -138,7 +139,7 @@ export default function SolicitudFormScreen() {
   };
 
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1 bg-white dark:bg-slate-950">
       <Cabecera titulo={id ? "Editar solicitud" : "Nueva solicitud"} />
 
       <ScrollFormulario className="px-4 pt-6" contentContainerClassName="pb-10">
@@ -177,7 +178,7 @@ export default function SolicitudFormScreen() {
               key={opcion}
               onPress={() => cambiar("tipo", opcion)}
               className={`px-4 py-2 rounded-full mr-2 ${
-                valores.tipo === opcion ? "bg-sky-600" : "bg-gray-200"
+                valores.tipo === opcion ? "bg-sky-600" : "bg-gray-200 dark:bg-slate-700"
               }`}
             >
               <Text

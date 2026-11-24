@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { View, Text, Modal, Pressable } from "react-native";
+import { View, Modal, Pressable } from "react-native";
+import Text from "../components/ThemedText";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import Cabecera from "../components/Cabecera";
@@ -100,7 +101,7 @@ export default function DiabetesScreen() {
   };
 
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1 bg-white dark:bg-slate-950">
       <Cabecera titulo="Riesgo Diabetes Tipo 2" />
 
       <ScrollFormulario className="px-4 pt-4" contentContainerClassName="pb-10">
@@ -185,9 +186,9 @@ export default function DiabetesScreen() {
       >
         <View className="flex-1 items-center justify-center bg-black/50 px-6">
           {resultado && (
-            <View className="bg-white rounded-3xl w-full overflow-hidden">
+            <View className="bg-white dark:bg-slate-900 rounded-3xl w-full overflow-hidden">
               <View className={`${estilos[resultado.datos.nivel].fondo} items-center px-5 py-6`}>
-                <View className="bg-white rounded-full p-3 mb-3">
+                <View className="bg-white dark:bg-slate-800 rounded-full p-3 mb-3">
                   <Ionicons
                     name={estilos[resultado.datos.nivel].icono}
                     size={44}

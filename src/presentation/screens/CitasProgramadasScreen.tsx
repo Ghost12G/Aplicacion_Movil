@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
-import { Modal, Pressable, ScrollView, Text, View } from "react-native";
+import { Modal, Pressable, ScrollView, View } from "react-native";
+import Text from "../components/ThemedText";
 import { useRouter } from "expo-router";
 import { Cita } from "../../domain/entities/Cita";
 import { Modalidad } from "../../domain/entities/Especialidad";
@@ -43,7 +44,7 @@ export default function CitasProgramadasScreen() {
   ];
 
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1 bg-white dark:bg-slate-950">
       <Cabecera titulo="Citas Programadas" />
 
       {/* Pestañas */}
@@ -53,7 +54,7 @@ export default function CitasProgramadasScreen() {
             key={op}
             onPress={() => setPestana(op)}
             className={`flex-1 py-3 items-center ${
-              pestana === op ? "bg-sky-900" : "bg-gray-200"
+              pestana === op ? "bg-sky-900" : "bg-gray-200 dark:bg-slate-700"
             }`}
           >
             <Text className={`text-lg ${pestana === op ? "text-white" : "text-gray-800"}`}>
@@ -86,7 +87,7 @@ export default function CitasProgramadasScreen() {
         {!cargando && visibles.map((c) => (
           <View
             key={c.id}
-            className="bg-white rounded-xl shadow mb-4 overflow-hidden border border-sky-200"
+            className="bg-white dark:bg-slate-900 rounded-xl shadow mb-4 overflow-hidden border border-sky-200 dark:border-slate-700"
           >
             <Text className="bg-sky-700 text-white font-bold text-center p-3">
               TIENES UNA CITA EN {c.especialidad} - {c.servicio}
@@ -144,7 +145,7 @@ export default function CitasProgramadasScreen() {
       >
         <View className="flex-1 items-center justify-center bg-black/50 px-5">
           {detalle && (
-            <View className="bg-white rounded-3xl p-5 w-full">
+            <View className="bg-white dark:bg-slate-900 rounded-3xl p-5 w-full">
               <View className="flex-row items-center justify-between mb-3">
                 <Text className="flex-1 text-center text-xl font-bold text-sky-800">
                   DETALLES DE LA CITA

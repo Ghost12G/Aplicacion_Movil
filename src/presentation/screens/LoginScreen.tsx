@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { View, Text, Image, Pressable } from "react-native";
+import { View, Image, Pressable } from "react-native";
+import Text from "../components/ThemedText";
 import { useRouter } from "expo-router";
 import InputField from "../components/InputField";
 import ScrollFormulario from "../components/ScrollFormulario";
@@ -74,7 +75,7 @@ export default function LoginScreen() {
 
   return (
     <ScrollFormulario
-      className="flex-1 bg-cyan-50"
+      className="flex-1 bg-cyan-50 dark:bg-slate-950"
       contentContainerClassName="px-6 pt-16 pb-8"
     >
       <Image
@@ -83,7 +84,7 @@ export default function LoginScreen() {
         resizeMode="contain"
       />
 
-      <View className="bg-white rounded-2xl p-5 shadow mb-5">
+      <View className="bg-white dark:bg-slate-900 rounded-2xl p-5 shadow mb-5">
         <Text className="text-3xl font-bold text-center mb-6">Bienvenido(a)</Text>
 
         <InputField

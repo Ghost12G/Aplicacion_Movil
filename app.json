@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "CLINIC DIGITAL",
+    "name": "Clinic Digital",
     "slug": "Aplicacion-Movil",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -14,7 +14,7 @@
       "package": "com.clinicdigital.app",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
+        "foregroundImage": "./assets/images/icon-digital.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },

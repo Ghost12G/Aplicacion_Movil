@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { View, Text, Pressable } from "react-native";
+import { View, Pressable } from "react-native";
+import Text from "../components/ThemedText";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import Cabecera from "../components/Cabecera";
@@ -58,12 +59,12 @@ export default function PerfilScreen() {
   };
 
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1 bg-white dark:bg-slate-950">
       <Cabecera titulo="Mi Perfil" />
 
       <ScrollFormulario className="px-4 pt-5" contentContainerClassName="pb-10">
         {usuario && (
-          <View className="flex-row items-center bg-cyan-50 rounded-xl p-4 mb-5">
+          <View className="flex-row items-center bg-cyan-50 dark:bg-slate-800 rounded-xl p-4 mb-5">
             <Ionicons name="person" size={40} color="#0369a1" />
             <View className="flex-1 ml-4">
               <Text className="font-bold text-base">{usuario.nombre.toUpperCase()}</Text>
@@ -81,7 +82,7 @@ export default function PerfilScreen() {
               key={op}
               onPress={() => setOperador(op)}
               className={`px-4 py-2 rounded-full mr-2 mb-2 ${
-                operador === op ? "bg-sky-600" : "bg-gray-200"
+                operador === op ? "bg-sky-600" : "bg-gray-200 dark:bg-slate-700"
               }`}
             >
               <Text className={operador === op ? "text-white" : "text-gray-700"}>{op}</Text>
@@ -97,7 +98,7 @@ export default function PerfilScreen() {
           teclado="numeric"
           error={errores.celular}
         />
-        <View className="flex-row items-center bg-gray-100 px-3 py-3 mb-4">
+        <View className="flex-row items-center bg-gray-100 dark:bg-slate-800 px-3 py-3 mb-4">
           <Ionicons name="mail" size={22} color="#9ca3af" />
           <Text className="ml-3 text-base text-gray-500">{usuario ? usuario.correo : ""}</Text>
         </View>

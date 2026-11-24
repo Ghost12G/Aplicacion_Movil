@@ -1,4 +1,5 @@
-import { View, Text, Pressable, ScrollView } from "react-native";
+import { View, Pressable, ScrollView } from "react-native";
+import Text from "./ThemedText";
 
 interface Props {
   opciones: string[];
@@ -18,7 +19,7 @@ export default function Pestanas({
       key={op}
       onPress={() => onCambiar(op)}
       className={`py-3 items-center ${desplazable ? "px-6" : "flex-1"} ${
-        activa === op ? "bg-sky-900" : "bg-gray-200"
+        activa === op ? "bg-sky-900" : "bg-gray-200 dark:bg-slate-700"
       }`}
     >
       <Text className={`text-lg ${activa === op ? "text-white" : "text-gray-800"}`}>

@@ -1,4 +1,5 @@
-import { Pressable, Text } from "react-native";
+import { Pressable } from "react-native";
+import Text from "./ThemedText";
 
 interface Props {
   titulo: string;
@@ -11,7 +12,7 @@ const colores = {
   primario: "bg-sky-600",
   secundario: "bg-sky-900",
   peligro: "bg-red-500",
-  gris: "bg-gray-200",
+  gris: "bg-gray-200 dark:bg-slate-700",
 };
 
 export default function Boton({
@@ -20,7 +21,7 @@ export default function Boton({
   variante = "primario",
   deshabilitado = false,
 }: Props) {
-  const fondo = deshabilitado ? "bg-gray-300" : colores[variante];
+  const fondo = deshabilitado ? "bg-gray-300 dark:bg-slate-600" : colores[variante];
   const colorTexto = variante === "gris" && !deshabilitado ? "text-gray-700" : "text-white";
 
   return (

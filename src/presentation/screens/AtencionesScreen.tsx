@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { ScrollView, Text, View } from "react-native";
+import { ScrollView, View } from "react-native";
+import Text from "../components/ThemedText";
 import { CENTRO } from "../../domain/constantes";
 import { TipoAtencion } from "../../domain/entities/Historial";
 import { historialService } from "../../infrastructure/container";
@@ -22,7 +23,7 @@ export default function AtencionesScreen() {
   );
 
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1 bg-white dark:bg-slate-950">
       <Cabecera titulo="Atenciones Realizadas" />
       <Pestanas opciones={tipos} activa={tipo} onCambiar={setTipo} desplazable />
 
