@@ -56,11 +56,34 @@ Las versiones instaladas están registradas en `package.json` y `package-lock.js
 - Para ejecutar con Expo Go: Expo Go instalado en un teléfono.
 - Para generar e instalar un APK local: Android Studio, Android SDK, Java/JDK y un emulador o teléfono Android. En el teléfono se puede habilitar la depuración USB.
 
+## Clonar el repositorio
+
+Clona el repositorio sin indicar una rama para descargar la rama que está configurada como predeterminada en GitHub:
+
+```bash
+git clone https://github.com/Ghost12G/Aplicacion_Movil.git
+cd Aplicacion_Movil
+```
+
+El archivo `.env` no se incluye en Git. Cada persona que clone el proyecto debe crear su propio archivo a partir de `.env.example` y configurar sus valores de Firebase antes de ejecutar la aplicación.
+
 ## Configuración de Firebase
 
 1. Crea o selecciona el proyecto de Firebase y habilita Authentication con el proveedor de correo y contraseña.
 2. Crea la base de datos de Cloud Firestore.
 3. Copia `.env.example` como `.env` y completa los valores de la configuración de la aplicación web de Firebase:
+
+   En Windows (CMD):
+
+   ```cmd
+   copy .env.example .env
+   ```
+
+   En PowerShell:
+
+   ```powershell
+   Copy-Item .env.example .env
+   ```
 
    ```env
    EXPO_PUBLIC_FIREBASE_API_KEY=
