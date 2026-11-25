@@ -5,7 +5,7 @@ interface Props {
   opciones: string[];
   activa: string;
   onCambiar: (opcion: string) => void;
-  desplazable?: boolean; // true cuando son muchas y no caben en pantalla
+  desplazable?: boolean;
 }
 
 export default function Pestanas({

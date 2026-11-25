@@ -2,7 +2,6 @@ import { DatosRegistro, Usuario } from "../../domain/entities/Usuario";
 import { UsuarioRepository } from "../../domain/repositories/UsuarioRepository";
 import { SesionRepository } from "../../domain/repositories/SesionRepository";
 
-// Registro, inicio de sesión y cierre de sesión
 export class AuthService {
   private usuarios: UsuarioRepository;
   private sesion: SesionRepository;
@@ -24,7 +23,6 @@ export class AuthService {
     return usuario;
   }
 
-  // Al abrir la app: si ya había una sesión iniciada, la recupera
   async restaurarSesion(): Promise<Usuario | null> {
     const usuario = await this.usuarios.restaurarSesion();
     this.sesion.establecerUsuario(usuario);

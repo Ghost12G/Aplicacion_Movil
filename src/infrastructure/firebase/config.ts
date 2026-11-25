@@ -4,7 +4,6 @@ import { getAuth, initializeAuth, getReactNativePersistence } from "firebase/aut
 import { getFirestore } from "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-// Los valores salen del archivo .env (variables EXPO_PUBLIC_...)
 const firebaseConfig = {
   apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -16,7 +15,6 @@ const firebaseConfig = {
 
 const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 
-// La sesión se guarda en el celular para no pedir el login cada vez
 function crearAuth() {
   try {
     return initializeAuth(app, { persistence: getReactNativePersistence(AsyncStorage) });

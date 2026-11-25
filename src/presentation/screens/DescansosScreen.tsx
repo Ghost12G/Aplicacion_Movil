@@ -17,7 +17,6 @@ export default function DescansosScreen() {
       .includes(busqueda.toLowerCase())
   );
 
-  // Último día de descanso = desde + (días - 1)
   const fechaHasta = (desde: Date, dias: number): Date => {
     const hasta = new Date(desde);
     hasta.setDate(hasta.getDate() + dias - 1);

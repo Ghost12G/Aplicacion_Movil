@@ -3,14 +3,12 @@ export const MESES = [
   "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
 ];
 
-// Devuelve la fecha como DD/MM/AAAA
 export function formatearFecha(fecha: Date): string {
   const dia = String(fecha.getDate()).padStart(2, "0");
   const mes = String(fecha.getMonth() + 1).padStart(2, "0");
   return `${dia}/${mes}/${fecha.getFullYear()}`;
 }
 
-// Devuelve la fecha y hora como DD/MM/AAAA 04:59 PM
 export function formatearFechaHora(fecha: Date): string {
   const horas24 = fecha.getHours();
   const sufijo = horas24 >= 12 ? "PM" : "AM";
@@ -19,20 +17,17 @@ export function formatearFechaHora(fecha: Date): string {
   return `${formatearFecha(fecha)} ${horas12}:${minutos} ${sufijo}`;
 }
 
-// Fecha relativa a este mes: -1 = mes pasado, 0 = este mes, 1 = mes siguiente
 export function fechaRelativa(meses: number, dia: number): Date {
   const hoy = new Date();
   return new Date(hoy.getFullYear(), hoy.getMonth() + meses, dia);
 }
 
-// Convierte "DD/MM/AAAA" y "HH:MM" en una fecha y hora reales
 export function fechaHoraDe(fecha: string, hora: string): Date {
   const [dia, mes, anio] = fecha.split("/").map(Number);
   const [horas, minutos] = hora.split(":").map(Number);
   return new Date(anio, mes - 1, dia, horas, minutos);
 }
 
-// true si esa fecha y hora ya pasaron según el reloj del sistema
 export function yaPaso(fecha: string, hora: string, ahora: Date = new Date()): boolean {
   return fechaHoraDe(fecha, hora).getTime() <= ahora.getTime();
 }
@@ -45,7 +40,6 @@ export function esDiaAgotado(fecha: Date): boolean {
   return fecha.getDate() % 4 === 0;
 }
 
-// Primer día con cupo, contando desde hoy + N días
 export function proximaFechaLibre(diasAdelante: number): Date {
   const fecha = new Date();
   fecha.setDate(fecha.getDate() + diasAdelante);

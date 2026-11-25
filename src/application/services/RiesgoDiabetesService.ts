@@ -4,7 +4,6 @@ import { DatosRiesgo, ResultadoRiesgo } from "../../domain/entities/RiesgoDiabet
 // Suma puntos según los datos del paciente (de 0 a 26) y los agrupa en
 // tres niveles. Es una guía referencial: no reemplaza una consulta médica.
 export class RiesgoDiabetesService {
-  // Índice de masa corporal: peso (kg) / talla (m) al cuadrado
   calcularImc(pesoKg: number, tallaCm: number): number {
     if (!(pesoKg > 0) || !(tallaCm > 0)) return 0;
     const tallaM = tallaCm / 100;
@@ -14,17 +13,14 @@ export class RiesgoDiabetesService {
   calcularPuntaje(datos: DatosRiesgo): number {
     let puntos = 0;
 
-    // Edad
     if (datos.edad > 64) puntos += 4;
     else if (datos.edad >= 55) puntos += 3;
     else if (datos.edad >= 45) puntos += 2;
 
-    // Índice de masa corporal
     const imc = this.calcularImc(datos.pesoKg, datos.tallaCm);
     if (imc > 30) puntos += 3;
     else if (imc >= 25) puntos += 1;
 
-    // Perímetro de la cintura (cambia según el sexo)
     if (datos.sexo === "Hombre") {
       if (datos.cinturaCm > 102) puntos += 4;
       else if (datos.cinturaCm >= 94) puntos += 3;
@@ -33,7 +29,6 @@ export class RiesgoDiabetesService {
       else if (datos.cinturaCm >= 80) puntos += 3;
     }
 
-    // Hábitos y antecedentes
     if (!datos.actividadFisica) puntos += 2;
     if (!datos.frutasVerduras) puntos += 1;
     if (datos.medicacionPresion) puntos += 2;

@@ -1,4 +1,3 @@
-// Convierte los errores de Firebase en mensajes claros en español
 export function traducirError(error: unknown): string {
   const codigo = (error as { code?: string }).code ?? "";
 

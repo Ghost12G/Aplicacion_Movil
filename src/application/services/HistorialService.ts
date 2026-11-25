@@ -2,7 +2,6 @@ import { Atencion, Descanso, Receta } from "../../domain/entities/Historial";
 import { HistorialRepository } from "../../domain/repositories/HistorialRepository";
 import { SesionRepository } from "../../domain/repositories/SesionRepository";
 
-// Consulta de atenciones, recetas y descansos médicos del paciente que inició sesión
 export class HistorialService {
   private historial: HistorialRepository;
   private sesion: SesionRepository;

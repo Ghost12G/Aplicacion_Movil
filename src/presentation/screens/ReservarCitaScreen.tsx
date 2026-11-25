@@ -228,7 +228,6 @@ export default function ReservarCitaScreen() {
     };
   }, [citaId, medico, tempFecha, intentoDisponibilidad]);
 
-  // Buscador: se queda con las especialidades que contienen lo escrito
   const listaFiltrada = especialidades.filter((e) =>
     e.nombre.toLowerCase().includes(busqueda.toLowerCase())
   );
@@ -457,14 +456,14 @@ export default function ReservarCitaScreen() {
         </View>
       )}
 
-      {/* ---------- Elegir fecha y hora ---------- */}
       {(!citaId || citaOriginal) && vista === "fecha" && (
         <ScrollView contentContainerClassName="pt-4 pb-10">
           <Calendario
             fechaElegida={tempFecha}
             onElegir={(f) => {
               setTempFecha(f);
-              setTempHora(""); // al cambiar de día se vuelve a elegir la hora
+              // Al cambiar el día, hay que volver a elegir la hora.
+              setTempHora("");
               setCargandoDisponibilidad(true);
               setErrorDisponibilidad("");
               setHorasNoDisponibles([]);
@@ -551,7 +550,6 @@ export default function ReservarCitaScreen() {
         </ScrollView>
       )}
 
-      {/* ---------- Pasos 1, 2 y 3 ---------- */}
       {(!citaId || citaOriginal) && vista !== "fecha" && (
         <ScrollView className="px-4 pt-3" contentContainerClassName="pb-10">
           <Text className="text-center font-bold text-sky-900 text-base">
@@ -561,7 +559,6 @@ export default function ReservarCitaScreen() {
 
           <PasosReserva paso={paso} />
 
-          {/* Paso 1: especialidad */}
           {vista === "especialidad" && (
             <View>
               {cargandoEspecialidades && (
@@ -678,7 +675,6 @@ export default function ReservarCitaScreen() {
             </View>
           )}
 
-          {/* Paso 2: médico */}
           {vista === "medico" && especialidad && (
             <View>
               <TarjetaInfo icono={especialidad.icono as NombreIcono}>
@@ -743,7 +739,6 @@ export default function ReservarCitaScreen() {
             </View>
           )}
 
-          {/* Paso 3: verificación */}
           {vista === "verificacion" && especialidad && medico && (
             <View>
               <Text className="text-xl font-bold text-center mb-3">

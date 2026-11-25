@@ -20,7 +20,6 @@ export default function CitasProgramadasScreen() {
   const [detalle, setDetalle] = useState<Cita | null>(null);
   const [citaACancelar, setCitaACancelar] = useState<Cita | null>(null);
 
-  // Buscador: filtra por especialidad o médico mientras se escribe
   const visibles = citas.filter(
     (c) =>
       c.modalidad === pestana &&
@@ -47,7 +46,6 @@ export default function CitasProgramadasScreen() {
     <View className="flex-1 bg-white dark:bg-slate-950">
       <Cabecera titulo="Citas Programadas" />
 
-      {/* Pestañas */}
       <View className="flex-row">
         {pestanas.map((op) => (
           <Pressable
@@ -136,7 +134,6 @@ export default function CitasProgramadasScreen() {
         )}
       </ScrollView>
 
-      {/* Detalles de la cita */}
       <Modal
         visible={detalle !== null}
         transparent

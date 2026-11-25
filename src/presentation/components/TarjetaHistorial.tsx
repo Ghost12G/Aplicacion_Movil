@@ -6,8 +6,8 @@ import { MESES } from "../../shared/fechas";
 
 interface Props {
   fecha: Date;
-  etiqueta?: string; // por ejemplo "(Atención)"
-  onPress?: () => void; // si se envía, la tarjeta se puede tocar
+  etiqueta?: string;
+  onPress?: () => void;
   children: ReactNode;
 }
 

@@ -104,7 +104,6 @@ export default function SolicitudesScreen() {
         )}
       </ScrollView>
 
-      {/* Botón + para crear una solicitud nueva */}
       <Pressable
         onPress={() => router.push("/solicitud")}
         className="absolute bottom-8 right-6 bg-sky-900 w-16 h-16 rounded-full items-center justify-center shadow-lg"

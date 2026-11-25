@@ -4,7 +4,7 @@ export interface Cita {
   id: string;
   pacienteUid?: string;
   medicoId: string;
-  pacienteDni: string; // dueño de la cita
+  pacienteDni: string;
   especialidadId?: string;
   especialidad: string;
   servicio: string;

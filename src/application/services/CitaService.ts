@@ -18,7 +18,6 @@ export interface DatosReserva {
   hora: string;
 }
 
-// Resultado de reservar: o se reservó, o se explica por qué no se pudo
 export type ResultadoReserva =
   | { ok: true; cita: Cita }
   | { ok: false; motivo: string };
@@ -30,7 +29,6 @@ function generarIdCita(): string {
   return `${Date.now().toString(36)}-${valorAleatorio}`;
 }
 
-// Reservar, consultar y cancelar citas
 export class CitaService {
   private citas: CitaRepository;
   private especialidades: EspecialidadRepository;
@@ -50,7 +48,6 @@ export class CitaService {
     return this.especialidades.obtenerTodas();
   }
 
-  // Solo las citas del paciente que inició sesión
   async listar(): Promise<Cita[]> {
     const usuario = this.sesion.obtenerUsuario();
     if (!usuario) return [];
@@ -78,14 +75,12 @@ export class CitaService {
     ).length;
   }
 
-  // Un horario está disponible si no pasó y todavía hay cupo con ese médico
   async estaDisponible(medicoId: string, fecha: string, hora: string): Promise<boolean> {
     if (yaPaso(fecha, hora)) return false;
     const citas = await this.citas.listar();
     return this.contarCitasEnHorario(citas, medicoId, fecha, hora) < CUPOS_POR_HORARIO;
   }
 
-  // Horas que no se pueden elegir: ya pasaron o ya están ocupadas
   async horasNoDisponibles(
     medicoId: string,
     fecha: string,
@@ -100,7 +95,6 @@ export class CitaService {
     );
   }
 
-  // Primer horario libre cercano a la cita sugerida del médico
   async sugerirHorario(medico: Medico): Promise<{ fecha: string; hora: string }> {
     const citas = await this.citas.listar();
     for (let extra = 0; extra < 14; extra++) {
@@ -121,7 +115,6 @@ export class CitaService {
       return { ok: false, motivo: "Debes iniciar sesión para reservar una cita." };
     }
 
-    // Regla 1: no se puede reservar en una hora que ya pasó
     if (yaPaso(datos.fecha, datos.hora)) {
       return { ok: false, motivo: "Esa fecha y hora ya pasaron. Elige un horario disponible." };
     }
@@ -194,7 +187,6 @@ export class CitaService {
     return { ok: true, cita: resultado.cita };
   }
 
-  // Solo se puede cancelar una cita propia
   async cancelar(id: string): Promise<void> {
     const esPropia = (await this.listar()).some((c) => c.id === id);
     const usuario = this.sesion.obtenerUsuario();

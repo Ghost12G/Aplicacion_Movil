@@ -30,7 +30,6 @@ const preguntas = [
   { campo: "familia", texto: "¿Se le ha diagnosticado diabetes (tipo 1 o tipo 2) a algún familiar?", opciones: ["No", FAMILIAR_LEJANO, FAMILIAR_DIRECTO], horizontal: false },
 ];
 
-// Colores e ícono del resultado según el nivel de riesgo
 const estilos: Record<
   NivelRiesgo,
   { fondo: string; icono: keyof typeof Ionicons.glyphMap; colorIcono: string }
@@ -177,7 +176,6 @@ export default function DiabetesScreen() {
         </View>
       </ScrollFormulario>
 
-      {/* Resultado */}
       <Modal
         visible={resultado !== null}
         transparent

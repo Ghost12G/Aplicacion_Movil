@@ -22,7 +22,6 @@ export default function HomeScreen() {
     router.replace("/login");
   };
 
-  // Cierra el menú y va a otra pantalla
   const ir = (ruta: Href) => {
     setMenuVisible(false);
     router.push(ruta);
@@ -30,7 +29,6 @@ export default function HomeScreen() {
 
   return (
     <View className="flex-1 bg-white dark:bg-slate-950">
-      {/* Cabecera */}
       <View className="flex-row items-center bg-sky-100 dark:bg-slate-800 pt-12 pb-4 px-4">
         <Pressable onPress={() => setMenuVisible(true)}>
           <Ionicons
@@ -56,7 +54,6 @@ export default function HomeScreen() {
         </Pressable>
       </View>
 
-      {/* Accesos */}
       <ScrollView className="px-4 pt-4">
         <Pressable
           onPress={() => router.push("/reservar")}
@@ -108,7 +105,6 @@ export default function HomeScreen() {
         <View className="h-8" />
       </ScrollView>
 
-      {/* Menú lateral */}
       <MenuLateral
         visible={menuVisible}
         onClose={() => setMenuVisible(false)}

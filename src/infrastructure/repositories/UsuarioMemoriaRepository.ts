@@ -3,7 +3,6 @@ import { UsuarioRepository } from "../../domain/repositories/UsuarioRepository";
 
 type UsuarioGuardado = Usuario & { password: string };
 
-// Guarda los usuarios EN MEMORIA: se pierden al cerrar la aplicación.
 export class UsuarioMemoriaRepository implements UsuarioRepository {
   private usuarios: UsuarioGuardado[] = [
     {

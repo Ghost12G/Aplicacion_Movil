@@ -8,7 +8,6 @@ import {
 } from "../../infrastructure/container";
 import { mensajeDeError } from "../../shared/errores";
 
-// Carga las citas al entrar en la pantalla y permite cancelarlas
 export function useCitas() {
   const [citas, setCitas] = useState<Cita[]>([]);
   const [cargando, setCargando] = useState(true);

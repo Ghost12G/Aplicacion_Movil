@@ -17,7 +17,6 @@ export default function SplashScreen() {
     });
 
     const iniciar = async () => {
-      // Se muestra el logo al menos 1.5 s mientras se revisa si ya había una sesión
       const [usuario] = await Promise.all([
         authService.restaurarSesion().catch(() => null),
         new Promise((resolver) => setTimeout(resolver, 1500)),

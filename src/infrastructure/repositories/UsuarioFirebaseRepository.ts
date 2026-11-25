@@ -17,7 +17,6 @@ type PerfilGuardado = Omit<Usuario, "uid">;
 
 const claveCopia = (uid: string) => `perfil:${uid}`;
 
-// Cuentas en Firebase Authentication y perfil en Firestore (colección "usuarios")
 export class UsuarioFirebaseRepository implements UsuarioRepository {
   async registrar(datos: DatosRegistro): Promise<Usuario> {
     try {
@@ -92,7 +91,6 @@ export class UsuarioFirebaseRepository implements UsuarioRepository {
     });
   }
 
-  // Lee el perfil de Firestore; si no hay internet, usa la última copia guardada
   private async cargarPerfil(user: User): Promise<Usuario> {
     try {
       const snap = await getDoc(doc(db, "usuarios", user.uid));
@@ -102,7 +100,6 @@ export class UsuarioFirebaseRepository implements UsuarioRepository {
         return usuario;
       }
     } catch {
-      // sin conexión: se usa la copia guardada
     }
 
     const copia = await AsyncStorage.getItem(claveCopia(user.uid));

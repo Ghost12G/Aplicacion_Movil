@@ -13,7 +13,6 @@ import TarjetaHistorial from "../components/TarjetaHistorial";
 
 const pestanas = ["Anteriores", "Mes Actual", "Siguientes"];
 
-// Decide en qué pestaña va una receta según su mes
 function categoria(fecha: Date): string {
   const hoy = new Date();
   const diferencia =
@@ -72,7 +71,6 @@ export default function RecetasScreen() {
         )}
       </ScrollView>
 
-      {/* Detalle de la receta */}
       <Modal
         visible={detalle !== null}
         transparent

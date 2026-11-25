@@ -3,7 +3,6 @@ import { SolicitudRepository } from "../../domain/repositories/SolicitudReposito
 import { SesionRepository } from "../../domain/repositories/SesionRepository";
 import { formatearFecha } from "../../shared/fechas";
 
-// CRUD de solicitudes: cada paciente ve y modifica solo las suyas
 export class SolicitudService {
   private solicitudes: SolicitudRepository;
   private sesion: SesionRepository;

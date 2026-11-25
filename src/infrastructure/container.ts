@@ -1,5 +1,3 @@
-// Aquí se "arman" las piezas: se crean los repositorios y se entregan
-// a los servicios. Las pantallas solo importan los servicios de este archivo.
 import { AuthService } from "../application/services/AuthService";
 import { CitaService } from "../application/services/CitaService";
 import { HistorialService } from "../application/services/HistorialService";

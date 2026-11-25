@@ -1,4 +1,3 @@
-// Nombre de la clínica que se muestra en la aplicación
 export const CENTRO = "Clinic Digital";
 
 // Cuántos pacientes puede atender un médico en un mismo horario.

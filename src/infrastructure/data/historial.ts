@@ -5,7 +5,6 @@ import { fechaRelativa } from "../../shared/fechas";
 // Los demás pacientes empiezan sin atenciones, recetas ni descansos.
 const DNI_DEMO = "12345678";
 
-// Datos de ejemplo (solo lectura)
 export const atenciones: Atencion[] = [
   { id: "a1", pacienteDni: DNI_DEMO, tipo: "C.Externa", especialidad: "ODONTOLOGIA", especialista: "20871-CASTRO LEON PAOLA", actoMedico: "375914", fecha: fechaRelativa(-1, 18) },
   { id: "a2", pacienteDni: DNI_DEMO, tipo: "C.Externa", especialidad: "ODONTOLOGIA", especialista: "20871-CASTRO LEON PAOLA", actoMedico: "372951", fecha: fechaRelativa(-1, 3) },

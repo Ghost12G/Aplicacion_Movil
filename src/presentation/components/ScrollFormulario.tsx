@@ -7,20 +7,17 @@ interface Props {
   contentContainerClassName?: string;
 }
 
-// ScrollView para formularios: cuando se abre el teclado, deja espacio extra
-// al final y sube la pantalla para que el campo que se está escribiendo
-// quede visible, justo por encima del teclado.
+// Mantiene visible el campo enfocado cuando aparece el teclado.
 export default function ScrollFormulario({
   children,
   className,
   contentContainerClassName,
 }: Props) {
   const scrollRef = useRef<ScrollView>(null);
-  const posicion = useRef(0); // cuánto se ha desplazado la pantalla
-  const tecladoArriba = useRef<number | null>(null); // dónde empieza el teclado
+  const posicion = useRef(0);
+  const tecladoArriba = useRef<number | null>(null);
   const [altoTeclado, setAltoTeclado] = useState(0);
 
-  // Si el campo enfocado queda tapado por el teclado, sube lo necesario
   const mostrarCampo = () => {
     const limite = tecladoArriba.current;
     if (limite === null) return;
@@ -48,7 +45,6 @@ export default function ScrollFormulario({
       tecladoArriba.current = null;
       setAltoTeclado(0);
     });
-    // Aviso que envía InputField cuando se toca otro campo con el teclado abierto
     const alEnfocar = DeviceEventEmitter.addListener("campo-enfocado", mostrarCampo);
 
     return () => {

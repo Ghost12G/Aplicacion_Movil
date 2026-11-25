@@ -46,7 +46,6 @@ export default function MenuLateral({
       onRequestClose={onClose}
     >
       <View className="flex-1 flex-row">
-        {/* Panel blanco del menú */}
         <View className="w-3/4 bg-white dark:bg-slate-900">
           <View className="bg-sky-100 dark:bg-slate-800 pt-14 px-5 pb-5">
             <Image
@@ -72,7 +71,6 @@ export default function MenuLateral({
           />
         </View>
 
-        {/* Zona oscura: al tocarla se cierra el menú */}
         <Pressable className="flex-1 bg-black/50" onPress={onClose} />
       </View>
     </Modal>
