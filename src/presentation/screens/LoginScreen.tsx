@@ -19,6 +19,10 @@ export default function LoginScreen() {
   const [mostrarMensaje, setMostrarMensaje] = useState(false);
   const [mensaje, setMensaje] = useState("");
   const [tipoMensaje, setTipoMensaje] = useState<"exito" | "error">("exito");
+  const [mostrarRecuperacion, setMostrarRecuperacion] = useState(false);
+  const [correoRecuperacion, setCorreoRecuperacion] = useState("");
+  const [enviandoRecuperacion, setEnviandoRecuperacion] = useState(false);
+  const [errorRecuperacion, setErrorRecuperacion] = useState("");
   const { valores, errores, setErrores, cambiar } = useFormulario({
     correo: "",
     password: "",
@@ -56,21 +60,30 @@ export default function LoginScreen() {
   };
 
   const recuperarPassword = async () => {
-    if (!formatoCorreo.test(valores.correo)) {
-      setErrores({ correo: "Escribe tu correo para recuperar la contraseña" });
+    setErrorRecuperacion("");
+    if (!formatoCorreo.test(correoRecuperacion)) {
+      setErrorRecuperacion("Escribe un correo válido.");
       return;
     }
 
+    setEnviandoRecuperacion(true);
     try {
-      await authService.recuperarPassword(valores.correo);
+      await authService.recuperarPassword(correoRecuperacion);
+      setMostrarRecuperacion(false);
       setTipoMensaje("exito");
       setMensaje("Te enviamos un enlace para restablecer tu contraseña.");
       setMostrarMensaje(true);
     } catch (error) {
-      setTipoMensaje("error");
-      setMensaje(mensajeDeError(error));
-      setMostrarMensaje(true);
+      setErrorRecuperacion(mensajeDeError(error));
+    } finally {
+      setEnviandoRecuperacion(false);
     }
+  };
+
+  const abrirRecuperacion = () => {
+    setCorreoRecuperacion(valores.correo);
+    setErrorRecuperacion("");
+    setMostrarRecuperacion(true);
   };
 
   return (
@@ -110,7 +123,7 @@ export default function LoginScreen() {
           deshabilitado={cargando}
         />
 
-        <Pressable onPress={recuperarPassword}>
+        <Pressable onPress={abrirRecuperacion}>
           <Text className="text-center font-bold text-sky-800 my-4">
             ¿Olvidaste tu contraseña?
           </Text>
@@ -124,7 +137,7 @@ export default function LoginScreen() {
         />
       </View>
 
-      <AvisoInfo texto="Consultas al 000 0000, de lunes a sábado." />
+      <AvisoInfo texto="Consultas al 0800 5045, de lunes a domingo." />
       <AvisoInfo texto="Visítanos en la sede más cercana de tu clínica." />
       <ModalExito
         visible={mostrarMensaje}
@@ -132,6 +145,28 @@ export default function LoginScreen() {
         mensaje={mensaje}
         tipo={tipoMensaje}
         onCerrar={() => setMostrarMensaje(false)}
+      />
+      <ModalExito
+        visible={mostrarRecuperacion}
+        titulo="Recuperar contraseña"
+        mensaje="Ingresa tu correo electrónico para enviarte el enlace de restablecimiento."
+        tipo="informacion"
+        textoAccion={enviandoRecuperacion ? "Enviando..." : "Enviar enlace"}
+        textoSecundario="Cancelar"
+        onCerrar={() => {
+          if (!enviandoRecuperacion) setMostrarRecuperacion(false);
+        }}
+        onAccion={enviandoRecuperacion ? undefined : recuperarPassword}
+        contenidoExtra={
+          <InputField
+            icono="mail"
+            placeholder="Correo electrónico"
+            value={correoRecuperacion}
+            onChangeText={setCorreoRecuperacion}
+            teclado="email-address"
+            error={errorRecuperacion}
+          />
+        }
       />
     </ScrollFormulario>
   );

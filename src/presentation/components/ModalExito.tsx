@@ -1,3 +1,4 @@
+import { ReactNode } from "react";
 import { Modal, View, Pressable } from "react-native";
 import Text from "./ThemedText";
 import { Ionicons } from "@expo/vector-icons";
@@ -11,6 +12,7 @@ interface Props {
   textoAccion?: string;
   onAccion?: () => void;
   textoSecundario?: string;
+  contenidoExtra?: ReactNode;
 }
 
 const estilos = {
@@ -49,6 +51,7 @@ export default function ModalExito({
   textoAccion = "Entendido",
   onAccion,
   textoSecundario = "Cancelar",
+  contenidoExtra,
 }: Props) {
   const estilo = estilos[tipo];
 
@@ -65,6 +68,7 @@ export default function ModalExito({
           <Text className="mt-3 text-center text-base leading-6 text-slate-600">
             {mensaje}
           </Text>
+          {contenidoExtra}
           <View className={`mt-6 ${onAccion ? "flex-row" : ""}`}>
             {onAccion && (
               <Pressable
