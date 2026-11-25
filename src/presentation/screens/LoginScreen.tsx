@@ -89,7 +89,8 @@ export default function LoginScreen() {
   return (
     <ScrollFormulario
       className="flex-1 bg-cyan-50 dark:bg-slate-950"
-      contentContainerClassName="px-6 pt-16 pb-8"
+      contentContainerClassName="flex-grow justify-center px-6 py-8"
+      ajustarConTeclado={!mostrarRecuperacion}
     >
       <Image
         source={require("../../../assets/images/logo-clinic-digital-horizontal.png")}

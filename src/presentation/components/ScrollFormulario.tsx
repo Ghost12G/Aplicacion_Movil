@@ -5,6 +5,7 @@ interface Props {
   children: ReactNode;
   className?: string;
   contentContainerClassName?: string;
+  ajustarConTeclado?: boolean;
 }
 
 // Mantiene visible el campo enfocado cuando aparece el teclado.
@@ -12,6 +13,7 @@ export default function ScrollFormulario({
   children,
   className,
   contentContainerClassName,
+  ajustarConTeclado = true,
 }: Props) {
   const scrollRef = useRef<ScrollView>(null);
   const posicion = useRef(0);
@@ -36,6 +38,11 @@ export default function ScrollFormulario({
   };
 
   useEffect(() => {
+    if (!ajustarConTeclado) {
+      tecladoArriba.current = null;
+      return;
+    }
+
     const alAbrir = Keyboard.addListener("keyboardDidShow", (e) => {
       tecladoArriba.current = e.endCoordinates.screenY;
       setAltoTeclado(e.endCoordinates.height);
@@ -52,7 +59,7 @@ export default function ScrollFormulario({
       alCerrar.remove();
       alEnfocar.remove();
     };
-  }, []);
+  }, [ajustarConTeclado]);
 
   return (
     <ScrollView
@@ -66,7 +73,7 @@ export default function ScrollFormulario({
       }}
     >
       {children}
-      <View style={{ height: altoTeclado }} />
+      <View style={{ height: ajustarConTeclado ? altoTeclado : 0 }} />
     </ScrollView>
   );
 }
