@@ -1,12 +1,12 @@
+import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import {
   DeviceEventEmitter,
-  View,
-  TextInput,
   Pressable,
+  TextInput,
   useColorScheme,
+  View,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import Text from "./ThemedText";
 
 interface Props {
@@ -73,7 +73,7 @@ export default function InputField({
         {esPassword && (
           <Pressable onPress={() => setOcultar(!ocultar)}>
             <Ionicons
-              name={ocultar ? "eye-outline" : "eye-off-outline"}
+              name={ocultar ? "eye-off-outline" : "eye-outline"}
               size={22}
               color={colorIcono}
             />
